@@ -14,26 +14,32 @@ knitr::opts_chunk$set(cache = TRUE)
 
 ### 1.
 
-Bayes' theorem:
+Model:  
+$\hat y \sim N(w_0 +w^tX_i, \sigma^2)$ where $w \sim N(0, \frac{\sigma^2}{\lambda})$
 
-$$ p(w|d)\propto(D|w)p(w)$$
-Probability of y:
+* $w$ - weights
+* $X$ - features
+* $\lambda$ - regularization penalty 
 
-$$ p(y| X, w,\sigma) = N(w_0 +w^tX_i, \sigma^2) $$
+<!-- Bayes' theorem: -->
 
-Prior probability:
+<!-- $$ p(w|d)\propto(D|w)p(w)$$ -->
+<!-- Probability of y: -->
 
-$$ p(w) \sim N(0, \frac{\sigma^2}{\lambda}) = \frac 1 {\sqrt{2 \pi \frac {\sigma^2 }{\lambda}} } e^ - { \frac {(w)^2}{2 \frac {\sigma^2}{\lambda}}} $$
-Likelihood:
+<!-- $$ p(y| X, w,\sigma) = N(w_0 +w^tX_i, \sigma^2) $$ -->
 
-$$ p(D|w) = \prod^n_{i = 1} N(w_0 +w^tX_i, \sigma^2) $$
+<!-- Prior probability: -->
 
-$$ p(D|w) = \prod^n_{i = 1} \frac 1 {\sqrt{2 \pi \sigma^2} } e^ - { \frac {(y - X_iw)^2}{2 \sigma^2}} = \frac 1 {(\sqrt{2 \pi \sigma^2})^n } e^ - \sum^n_{i = 1} \frac{(y_i - w^TX_i)^2} {2\sigma^2} $$
+<!-- $$ p(w) \sim N(0, \frac{\sigma^2}{\lambda}) = \frac 1 {\sqrt{2 \pi \frac {\sigma^2 }{\lambda}} } e^ - { \frac {(w)^2}{2 \frac {\sigma^2}{\lambda}}} $$ -->
+<!-- Likelihood: -->
 
-Model:
+<!-- $$ p(D|w) = \prod^n_{i = 1} N(w_0 +w^tX_i, \sigma^2) $$ -->
 
-$$ p(w|D) \propto \frac 1 {(\sqrt{2 \pi \sigma^2})^n } e^ - \sum^n_{i = 1} \frac{(y_i - w^TX_i)^2} {2\sigma^2}  * \frac 1 {\sqrt{2 \pi \frac {\sigma^2 }{\lambda}} } e^ - { \frac {(w)^2}{2 \frac {\sigma^2}{\lambda}}} = \frac{\sqrt \lambda}{(\sqrt{2 \pi \sigma^2})^{n+1}} e^{- \frac{\sum^n_{i=1} (y_i - w^TX_i)^2 + w^2\lambda}{2\sigma^2}} $$
+<!-- $$ p(D|w) = \prod^n_{i = 1} \frac 1 {\sqrt{2 \pi \sigma^2} } e^ - { \frac {(y - X_iw)^2}{2 \sigma^2}} = \frac 1 {(\sqrt{2 \pi \sigma^2})^n } e^ - \sum^n_{i = 1} \frac{(y_i - w^TX_i)^2} {2\sigma^2} $$ -->
 
+<!-- Model: -->
+
+<!-- $$ p(w|D) \propto \frac 1 {(\sqrt{2 \pi \sigma^2})^n } e^ - \sum^n_{i = 1} \frac{(y_i - w^TX_i)^2} {2\sigma^2}  * \frac 1 {\sqrt{2 \pi \frac {\sigma^2 }{\lambda}} } e^ - { \frac {(w)^2}{2 \frac {\sigma^2}{\lambda}}} = \frac{\sqrt \lambda}{(\sqrt{2 \pi \sigma^2})^{n+1}} e^{- \frac{\sum^n_{i=1} (y_i - w^TX_i)^2 + w^2\lambda}{2\sigma^2}} $$ -->
 ### 2.
 
 Scaling data:
@@ -53,13 +59,13 @@ test=parkinsons.scaled[-id,]
 
 ### 3.
 
-As we will be optimizing $\sigma$ and $w$, likelihood and prior should contain all $\sigma$, even if data is scaled (so it means that $\sigma = 1$): 
+As we will be optimizing $\sigma$ and $w$, likelihood and prior should contain all $\sigma$, even if data is scaled (so it means that $\sigma \sim 1$): 
  
 $$ log(posterior) = log(likelihood* prior) = log(likelihood) + log(prior)$$
 
 #### a)
 
-log - likelihood:
+loglikelihood:
 $$log (p(D|w)) = - \frac n {2} log(2 \pi \sigma^2) - \sum^n_{i = 1} \frac{(y_i - w^TX_i)^2} {2\sigma^2}$$
 
 ```{r}
@@ -104,7 +110,7 @@ ridge <- function(x, lambda){
 
 #### c)
 
-function to predict weights($w$) and $\sigma$
+function to predict weights ($w$) and $\sigma$
 ```{r}
 ridgeOpt <- function(lambda){
   x <- rep(1,17)
@@ -170,7 +176,7 @@ row.names(mm) <- c("lambda = 1", "lambda = 100", "lambda = 1000")
 colnames(mm) <- c("MSE train", "MSE test")
 knitr::kable(mm)
 ```
- $\lambda = 100$ is better than others because MSE for train set and for test set is lowest. MSE is good loss function because it is a minus log-likelihood of the model(?)
+ $\lambda = 100$ is better than others because MSE for train set and for test set is lowest. MSE is good loss function because it comes from model's MLE.
 
 ### 5.
 
