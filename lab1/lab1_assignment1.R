@@ -14,7 +14,7 @@ plot_observation <- function(id, M){
   number <- matrix(M[id, 1:(ncol(M)-1)], 8,8)
   mode(number) = "numeric"
   image(number[,nrow(number):1], col=grey(seq(0, 1, length = 256)))
-  return(M[id, ncol(M)])
+  return(as.numeric(M[id, ncol(M)]))
 }
 
 plot_observation(5, digits)
