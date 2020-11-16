@@ -205,7 +205,7 @@ best_K <- (which(
 cat("The best performing K parameter are k =", as.character(best_K))
 ```
 
-The complexity of the model increases as K decreases. For instance with $K=1$ the error in training data is minimum resulting in minimum bias, whereas the variance is great as there are higher chances of getting error in testing set (generalizes worse). Luckily, our optimal K (lowest error produced) coincides with a span where low variance and bias is attained. Before this spot, variance is decreasing and it starts increasing when it gets it passed. In regards to bias, the relationship with k is not that smooth, roughly it decreases until it reaches optimal K end then starts to increase again. 
+The complexity of the model increases as K increases. For instance with $K=1$ the error in training data is minimum resulting in minimum bias, whereas the variance is great as there are higher chances of getting error in testing set (generalizes worse, overfits). The training data is getting memorised at lowest K's, resulting in high variance. With higher K, training error increases (bias increases) but testing error decreases (decreasing variance) up to a point (optimal K, the sweet spot). Luckily, our optimal K (lowest error produced in validation set) coincides with a span where low variance and bias is attained. Before this spot, variance is decreasing and it starts increasing when it gets it passed. In regards to bias, the relationship with k is not that smooth, roughly it decreases until it reaches optimal K end then starts to increase again. 
 
 Testing of optimal K with Testing set. This is the Confusion Matrix for the optimal K in the Testing set. 
 
