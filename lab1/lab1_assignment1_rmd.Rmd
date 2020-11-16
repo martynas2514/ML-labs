@@ -100,7 +100,7 @@ cat("Misclassification error in training set is", 1 - accuracy_train)
 ```
 
 
-As seen in the results, misclassification error surpasses training error which shows absence of underfitting. Classification behavior looks quite good since the error of misclassification doesn't exceed 0.1 in neither of the cases. 
+As seen in the results, misclassification test error surpasses training error which shows absence of underfitting. Classification behavior looks quite good since the error of misclassification doesn't exceed 0.05 in neither of the cases. 
 
 
 ## 3 
