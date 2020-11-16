@@ -7,7 +7,7 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_chunk$set(cache = TRUE)
+#knitr::opts_chunk$set(cache = TRUE)
 ```
 
 # Assignment 2
@@ -20,7 +20,7 @@ $\hat y \sim N(w_0 +w^tX_i, \sigma^2)$ where $w \sim N(0, \frac{\sigma^2}{\lambd
 * $w$ - weights
 * $X$ - features
 * $\lambda$ - regularization penalty
-* $\sigma$ - variance
+* $\sigma$ - standard deviation
 
 <!-- Bayes' theorem: -->
 
@@ -72,16 +72,14 @@ $$log (p(D|w)) = - \frac n {2} log(2 \pi \sigma^2) - \sum^n_{i = 1} \frac{(y_i -
 ```{r}
 
 loglikelihood <- function(w, sigma){
-  n <- dim(train)[1]
-  part1 <- -(n/ 2) * log(2 * pi*(sigma^2))
-  sum <- 0
-  for (i in 1:n) {
-    y <- train[i, 1]
-    x <- train[i, -1]
-    temp <- (y - (t(w) %*% x))^2
-    sum <- sum + as.vector(temp) 
-  }
-  return(part1 - (sum/(2*(sigma)^2)))
+n <- dim(train)[1]
+part1 <- -(n/ 2) * log(2 * pi*(sigma^2))
+
+y <- train[, 1]
+x <- train[, -1]
+res <- sum((y - (x %*% w))^2)
+
+return(part1 - (res/(2*(sigma^2))))
 }
 
 ```
@@ -150,7 +148,8 @@ task4 <- function(lambda){
   predict <- train[ , -1] %*% w
   y <- train[ ,1]
   
-  MSEtrain <- (1/n) * t((y-predict)) %*% (y-predict) 
+  MSEtrain <- (1/n) * t((y-predict)) %*% (y-predict)
+  n <- dim(test)[1]
   predict <- test[ , -1] %*% w
   y <- test[ ,1]
   
@@ -190,6 +189,17 @@ DF <- function(lambda){
   return(sum(diag(part2)))
 }
 
+loglikelihood <- function(w, sigma){
+n <- dim(train)[1]
+part1 <- -(n/ 2) * log(2 * pi*(sigma^2))
+
+y <- parkinsons.scaled[, 1]
+x <- parkinsons.scaled[, -1]
+res <- sum((y - (x %*% w))^2)
+
+return(part1 - (res/(2*(sigma^2))))
+}
+
 
 ```
 
@@ -226,14 +236,10 @@ test=parkinsons.scaled[-id,]
 loglikelihood <- function(w, sigma){
   n <- dim(train)[1]
   part1 <- -(n/ 2) * log(2 * pi*(sigma^2))
-  sum <- 0
-  for (i in 1:n) {
-    y <- train[i, 1]
-    x <- train[i, -1]
-    temp <- (y - (t(w) %*% x))^2
-    sum <- sum + as.vector(temp) 
-  }
-  return(part1 - (sum/(2*(sigma)^2)))
+  y <- train[, 1]
+  x <- train[, -1]
+  res <- sum((y - (x %*% w))^2)
+  return(part1 - (res/(2*(sigma^2))))
 }
 
 ridge <- function(x, lambda){
@@ -270,7 +276,8 @@ task4 <- function(lambda){
   predict <- train[ , -1] %*% w
   y <- train[ ,1]
   
-  MSEtrain <- (1/n) * t((y-predict)) %*% (y-predict) 
+  MSEtrain <- (1/n) * t((y-predict)) %*% (y-predict)
+  n <- dim(test)[1]
   predict <- test[ , -1] %*% w
   y <- test[ ,1]
   

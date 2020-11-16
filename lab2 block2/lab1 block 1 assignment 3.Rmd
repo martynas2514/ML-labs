@@ -36,21 +36,32 @@ model=pamr.train(mydata)
 cvmodel=pamr.cv(model,mydata)
 minError <- which.min(cvmodel$error)
 bestTh <- cvmodel$threshold[minError]
+
 ```
 
 
 ```{r , echo=FALSE}
 pamr.plotcen(model, mydata, threshold = bestTh)
 ```
-```{r , echo=FALSE}
-numberOfGenes <- model$nonzero[minError]
 
+
+
+
+```{r , echo=FALSE, results = FALSE}
+numberOfGenes <- model$nonzero[minError]
+listOfGenes  <- pamr.listgenes(model, mydata, bestTh)
+bestGenes <- mydata$genenames[as.vector(as.numeric(listOfGenes[1:2,1]))]
 ```
-Number of genes selected when threshold = `r bestTh` : `r numberOfGenes`
+Centroid plot shows distance from gene mean value to global mean value. Positive or negative shows direction to the global mean.  Yes, it can happen that all values for some gene in centroid plot are positivive. Number of genes selected when threshold = `r bestTh` : `r numberOfGenes`.
 
 
 2. 
 
+ Most contributed genes: `r bestGenes`.
+ alternative names: CD74, HLA-DRA.
+ These genes are marker genes for B cells
+ 
+ 
 ```{r , echo=FALSE, echo=FALSE, results = FALSE, message=FALSE, warning=FALSE}
 rownames(test)=1:nrow(test)
 genenames <- colnames(test[ ,-ncol(test)])
@@ -62,33 +73,43 @@ confusionMatrix <- pamr.predict(model, testdata$x, threshold = bestTh)
 ```
 
 ```{r , echo=FALSE}
-knitr::kable(table(testdata$y,confusionMatrix))
+#knitr::kable(table(testdata$y,confusionMatrix))
 ```
 Test error: `r sum(testdata$y != confusionMatrix)`
 
 3. 
 
-Elastic net:
 
-```{r , echo=FALSE}
+```{r , echo=FALSE, results = FALSE, message=FALSE, warning=FALSE}
 library(glmnet)
 x <- as.matrix(train[ ,-ncol(train)])
 cv.elastic <- cv.glmnet(x, train$CellType, alpha = 0.5, family = "multinomial")
 
-res <- predict(cv.elastic, newx = as.matrix(test[ ,-ncol(test)]), s = cv.elastic$lambda.min, type = "class")
+res1 <- predict(cv.elastic, newx = as.matrix(test[ ,-ncol(test)]), s = cv.elastic$lambda.min, type = "class")
 ```
 
 ```{r , echo=FALSE}
-knitr::kable(table(testdata$y,res))
+#knitr::kable(table(testdata$y,res1))
 ```
 
-Test error: `r sum(testdata$y != res)`
 
-```{r , echo=FALSE}
+
+```{r , echo=FALSE, results = FALSE, message=FALSE, warning=FALSE}
 library("kernlab")
 
 x <- as.matrix(unname(train[ ,-ncol(train)]))
-svp = ksvm(x,train$CellType, type="C-svc", kernel='vanilladot')
+svp = ksvm(x = x,y = train$CellType,  kernel='vanilladot')
 
-res <- predict(cv.elastic, newx = as.matrix(test[ ,-ncol(test)]), s = cv.elastic$lambda.min, type = "class")
+res2 <- predict(svp, as.matrix(test[ ,-ncol(test)]))
 ```
+
+```{r , echo=FALSE}
+results <- matrix(c(sum(testdata$y != confusionMatrix), numberOfGenes), nrow = 1)
+results <- rbind(results,c(sum(testdata$y != res1), cv.elastic$glmnet.fit$df[which(cv.elastic$glmnet.fit$lambda == cv.elastic$lambda.min)]))
+results <- rbind(results, c(sum(testdata$y != res2), nrow(mydata$x)))
+row.names(results) <- c("NSC", "EN", "SVM")
+colnames(results) <- c("Test error", "N. features")
+knitr::kable(results)
+```
+I prefer Elastic net, because SVM might overfit and use a lot of parameters, NSC might have underfited.
+
