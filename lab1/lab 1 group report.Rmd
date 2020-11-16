@@ -24,7 +24,8 @@ knitr::opts_chunk$set(cache = TRUE)
 
 # Assignment 1
 
-## 1. 
+## 1 
+
 
 Import the data into R and divide it into training, validation and test sets (50%/25%/25%) by using the 
 partitioning principle specified in the lecture slides.
@@ -32,7 +33,7 @@ partitioning principle specified in the lecture slides.
 
 ```{r}
 digits <- read.csv(
-  file = "optdigits.csv")
+  file = "C:/Users/alejo/Documents/GitHub_Repos/ML-labs/lab1/optdigits.csv")
 digits[,ncol(digits)] <- data.frame(sapply(digits[,ncol(digits)], 
                                         as.character),stringsAsFactors = TRUE)
 names(digits) <- c(seq.int(ncol(digits)-1),"target")
@@ -72,7 +73,7 @@ plot_observation <- function(id, M){
 plot_observation(5, digits)
 ```
 
-## 2.
+## 2
 
 Use training data to fit 30-nearest neighbor classifier with function kknn() and kernel=”rectangular” from package kknn and estimate
  - Confusion matrices for the training and test data (use table())
@@ -109,10 +110,10 @@ cat("Misclassification error in training set is", 1 - accuracy_train)
 ```
 
 
-As seen in the results, misclassification error surpasses training error which shows absence of underfitting. Classification behavior looks quite good since the error of misclassification doesn't exceed 0.1 in neither of the cases. 
+As seen in the results, misclassification test error surpasses training error which shows absence of underfitting. Classification behavior looks quite good since the error of misclassification doesn't exceed 0.05 in neither of the cases. 
 
 
-## 3. 
+## 3 
 
 Find any 2 cases of digit “8” in the training data which were easiest to classify and 3 cases that were hardest to classify (i.e. having highest and lowest probabilities of the correct class). Reshape features for each of these cases as matrix 8x8 and visualize the corresponding digits (by using e.g. heatmap() function with parameters Colv=NA and Rowv=NA) and comment on whether these cases seem to be hard or easy to recognize visually.
 
@@ -159,7 +160,7 @@ plot_observation(worst_8_indexes[3], dfTraining)
 
 Undoubtedly, the classified observations as 8s with less certainty are visually harder to tell apart from other numbers as the trace is pretty unclear. This doesn't happen to the correctly classified with high certainty. 
 
-## 4. 
+## 4 
 
 
 Fit a K-nearest neighbor classifiers to the training data for different values of $K=1,2,…,30$ and plot the dependence of the training and validation misclassification errors on the value of K (in the same plot). How does the model complexity change when K increases and how does it affect the training and validation errors? Report the optimal $K$ according to this plot. Discuss this plot from the perspective of bias-variance tradeoff. Finally, estimate the test error for the model having the optimal K, compare it with the training and validation errors and make necessary conclusions regarding the model quality.
@@ -230,7 +231,7 @@ cat("Misclassification error is", accuracy_test)
 ```
 The error obtained in testing set classification is comparable to the error got among the best performing K at validation test classification. It leads us to thing the model is generalising properly.
 
-## 5.
+# 5
 
 Fit K-nearest neighbor classifiers to training data for different values of $K =1,2,…,30$, compute the empirical risk for the validation data as cross-entropy ( when computing log of probabilities add a small constant within log, e.g. 1e-15, to avoid numerical problems) and plot the dependence of the empirical risk on the value of $K$. What is the optimal $K$ value here? Why might the cross-entropy be a more suitable choice of the empirical risk function than the misclassification error for this problem?
 
