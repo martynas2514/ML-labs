@@ -24,7 +24,8 @@ knitr::opts_chunk$set(cache = TRUE)
 
 # Assignment 1
 
-## 1. 
+## 1 
+
 
 Import the data into R and divide it into training, validation and test sets (50%/25%/25%) by using the 
 partitioning principle specified in the lecture slides.
@@ -32,7 +33,7 @@ partitioning principle specified in the lecture slides.
 
 ```{r}
 digits <- read.csv(
-  file = "optdigits.csv")
+  file = "C:/Users/alejo/Documents/GitHub_Repos/ML-labs/lab1/optdigits.csv")
 digits[,ncol(digits)] <- data.frame(sapply(digits[,ncol(digits)], 
                                         as.character),stringsAsFactors = TRUE)
 names(digits) <- c(seq.int(ncol(digits)-1),"target")
@@ -72,7 +73,7 @@ plot_observation <- function(id, M){
 plot_observation(5, digits)
 ```
 
-## 2.
+## 2
 
 Use training data to fit 30-nearest neighbor classifier with function kknn() and kernel=”rectangular” from package kknn and estimate
  - Confusion matrices for the training and test data (use table())
@@ -109,10 +110,10 @@ cat("Misclassification error in training set is", 1 - accuracy_train)
 ```
 
 
-As seen in the results, misclassification error surpasses training error which shows absence of underfitting. Classification behavior looks quite good since the error of misclassification doesn't exceed 0.1 in neither of the cases. 
+As seen in the results, misclassification test error surpasses training error which shows absence of underfitting. Classification behavior looks quite good since the error of misclassification doesn't exceed 0.05 in neither of the cases. 
 
 
-## 3. 
+## 3 
 
 Find any 2 cases of digit “8” in the training data which were easiest to classify and 3 cases that were hardest to classify (i.e. having highest and lowest probabilities of the correct class). Reshape features for each of these cases as matrix 8x8 and visualize the corresponding digits (by using e.g. heatmap() function with parameters Colv=NA and Rowv=NA) and comment on whether these cases seem to be hard or easy to recognize visually.
 
@@ -159,7 +160,7 @@ plot_observation(worst_8_indexes[3], dfTraining)
 
 Undoubtedly, the classified observations as 8s with less certainty are visually harder to tell apart from other numbers as the trace is pretty unclear. This doesn't happen to the correctly classified with high certainty. 
 
-## 4. 
+## 4 
 
 
 Fit a K-nearest neighbor classifiers to the training data for different values of $K=1,2,…,30$ and plot the dependence of the training and validation misclassification errors on the value of K (in the same plot). How does the model complexity change when K increases and how does it affect the training and validation errors? Report the optimal $K$ according to this plot. Discuss this plot from the perspective of bias-variance tradeoff. Finally, estimate the test error for the model having the optimal K, compare it with the training and validation errors and make necessary conclusions regarding the model quality.
@@ -230,7 +231,7 @@ cat("Misclassification error is", accuracy_test)
 ```
 The error obtained in testing set classification is comparable to the error got among the best performing K at validation test classification. It leads us to thing the model is generalising properly.
 
-## 5.
+# 5
 
 Fit K-nearest neighbor classifiers to training data for different values of $K =1,2,…,30$, compute the empirical risk for the validation data as cross-entropy ( when computing log of probabilities add a small constant within log, e.g. 1e-15, to avoid numerical problems) and plot the dependence of the empirical risk on the value of $K$. What is the optimal $K$ value here? Why might the cross-entropy be a more suitable choice of the empirical risk function than the misclassification error for this problem?
 
@@ -677,7 +678,8 @@ library(reshape2)
 #### 1 ####
 
 digits <- read.csv(file = 'optdigits.csv')
-digits[,ncol(digits)] <- data.frame(sapply(digits[,ncol(digits)], as.character),stringsAsFactors = TRUE)
+digits[,ncol(digits)] <- data.frame(sapply(digits[,ncol(digits)], as.character),
+stringsAsFactors = TRUE)
 names(digits) <- c(seq.int(ncol(digits)-1),"target")
 #digits[1,]
 
@@ -742,7 +744,8 @@ cat("Misclassification in training set is", 1 - accuracy_train)
 
 ##### 3 ######
 
-# Getting the probabilities of prediction probabilities, joining with the actual category and the prediction made
+# Getting the probabilities of prediction probabilities, joining with the actual
+category and the prediction made
 
 prob_df <- kknn_model$prob
 max_prob <- colnames(prob_df)[apply(prob_df,1,which.max)]
@@ -757,10 +760,12 @@ actual_8s <- train_probs[train_probs["actual"]==8,]
 predicted_actual_8s <- actual_8s[actual_8s["pred"]==8,]
 
 # 8 predicted correctly with high certainty
-best_8_indexes <- as.numeric(row.names(predicted_actual_8s[order(-predicted_actual_8s[,9]),][1:2,]))
+best_8_indexes <- as.numeric(
+row.names(predicted_actual_8s[order(-predicted_actual_8s[,9]),][1:2,]))
 
 # 8 predicted wrongly with high certainty
-worst_8_indexes <- as.numeric(row.names(predicted_actual_8s[order(predicted_actual_8s[,9]),][1:3,]))
+worst_8_indexes <- as.numeric(row.names(predicted_actual_8s[order(
+predicted_actual_8s[,9]),][1:3,]))
 
   
 dfTraining[best_8_indexes,]
@@ -790,8 +795,10 @@ for (k in 1:30){
   
   # Fit for dfValidation and dfTraining
   
-  KKNN_model_valid <- kknn(dfTraining[["target"]] ~ ., dfTraining, dfValidation, k = k, kernel = "rectangular")
-  KKNN_model_train <- kknn(dfTraining[["target"]] ~ ., dfTraining, dfTraining, k = k, kernel = "rectangular")
+  KKNN_model_valid <- kknn(dfTraining[["target"]] ~ ., 
+  dfTraining, dfValidation, k = k, kernel = "rectangular")
+  KKNN_model_train <- kknn(dfTraining[["target"]] ~ .,
+  dfTraining, dfTraining, k = k, kernel = "rectangular")
   
   # Calculation of Accuracies
   
@@ -808,21 +815,25 @@ for (k in 1:30){
 
 # Plot of Accuracies
 
-metrics <- data.frame(KKNN_misclassification_validation, KKNN_misclassification_training, 1:30)
+metrics <- data.frame(KKNN_misclassification_validation,
+KKNN_misclassification_training, 1:30)
 names(metrics) <- c("validation", "training", "k")
 
 
 metricsMelted <- melt(metrics, id.var='k')
 names(metricsMelted)[3] <- "Misclassification_Error"
 head(metricsMelted)
-ggplot(metricsMelted, aes(x=k, y=Misclassification_Error, col=variable)) + geom_line()
+ggplot(metricsMelted, aes(x=k, y=Misclassification_Error,
+col=variable)) + geom_line()
 
-best_K <- (which(KKNN_misclassification_validation==min(KKNN_misclassification_validation)))
+best_K <- (which(
+KKNN_misclassification_validation==min(KKNN_misclassification_validation)))
 cat("The best performant K parameter are k =", as.character(best_K))
 
 # Testing of optimal K with Testing set
 
-kknn_model <- kknn(dfTraining[["target"]] ~ ., dfTraining, dfTest, k = max(best_K), kernel = "rectangular")
+kknn_model <- kknn(dfTraining[["target"]] ~ .,
+dfTraining, dfTest, k = max(best_K), kernel = "rectangular")
 
 fit <- fitted(kknn_model)
 CM_test <- table(dfTest$target, fit)
@@ -845,9 +856,11 @@ empirical_risk <- c()
 
 for (k in 1:30){
   
-  KKNN_model_valid <- kknn(dfTraining[["target"]] ~ ., dfTraining, dfValidation, k = k, kernel = "rectangular")
+  KKNN_model_valid <- kknn(dfTraining[["target"]] ~ ., dfTraining,
+  dfValidation, k = k, kernel = "rectangular")
   
-  # Extraction of probabilities, we build a df with the target hot encoded to add a column of cross-entropy loss
+  # Extraction of probabilities, we build a df with the target hot 
+  encoded to add a column of cross-entropy loss
   
   prob_df <- KKNN_model_valid$prob
   max_prob <- colnames(prob_df)[apply(prob_df,1,which.max)]
@@ -860,7 +873,8 @@ for (k in 1:30){
   
   # column of cross-entropy loss
   for (row in 1:nrow(valid_probs)){
-    valid_probs[row, "cross_entropy"] <- -sum(log(valid_probs[row, 1:10]+1e-15, base = 10)*valid_probs[[row,"coded"]] )
+    valid_probs[row, "cross_entropy"] <- -sum(log(valid_probs[row, 1:10]+1e-15,
+    base = 10)*valid_probs[[row,"coded"]] )
   }
   
   empirical_risk[k] <- mean(valid_probs$cross_entropy)
@@ -949,7 +963,8 @@ task4 <- function(lambda){
   y <- test[ ,1]
   
   MSEtest <- (1/n) * t((y-predict)) %*% (y-predict)
-  result <- list(w = w, sigma = a$par[17], testMSE = MSEtest, trainMSE = MSEtrain)
+  result <- list(w = w, sigma = a$par[17], testMSE = MSEtest, 
+  trainMSE = MSEtrain)
   return(result)
 
 }
@@ -997,7 +1012,8 @@ test=data[-id,]
 #1
 X_train = as.matrix(train[2:101])
 Y_train = as.matrix(train$Fat)
-fit_train = lm(Fat ~ . , data = train[2:102]) #fitting linear regression to training data
+fit_train = lm(Fat ~ . , data = train[2:102]) #fitting linear 
+#regression to training data
 y_hat_train = predict(fit_train)
 train_mse = mean((y_hat_train-Y_train)^2) 
 cat("MSE for training data is ",train_mse)
@@ -1014,13 +1030,16 @@ cat("MAE for training data is ",mean(abs(y_hat_test - Y_test)))
 #3
 covariates = scale(train[ ,2:101])
 response = scale(train[ ,102])
-model_lasso = glmnet(as.matrix(covariates), response, alpha = 1, family = "gaussian")
+model_lasso = glmnet(as.matrix(covariates), response, alpha = 1,
+family = "gaussian")
 plot(model_lasso, xvar = "lambda", label = T)
 model=cv.glmnet(as.matrix(covariates),
                 response, alpha=1,family="gaussian")
-model_lasso_3 = glmnet(as.matrix(covariates), response, alpha = 1, family = "gaussian", lambda = model$lambda[which(model$nzero == 3)])
+model_lasso_3 = glmnet(as.matrix(covariates), response, alpha = 1, 
+family = "gaussian", lambda = model$lambda[which(model$nzero == 3)])
 plot(model_lasso_3, xvar = "lambda", label = T)
-cat("Lambda values that give 3 variables are :",model$lambda[which(model$nzero == 3)])
+cat("Lambda values that give 3 variables are :",
+model$lambda[which(model$nzero == 3)])
 
 #4
 df = function(lambda){
@@ -1039,37 +1058,46 @@ plot(lambda_values, degrees_of_freedom)
 #5
 covariates = scale(train[ ,2:101])
 response = scale(train[ ,102])
-model_ridge = glmnet(as.matrix(covariates), response, alpha = 0, family = "gaussian")
+model_ridge = glmnet(as.matrix(covariates), response, alpha = 0,
+family = "gaussian")
 plot(model_ridge, main = "RIDGE", xvar = "lambda", label = T)
 
 #6
-model_l=cv.glmnet(as.matrix(covariates), response, alpha=1,family="gaussian",lambda=seq(0,1,0.001))
+model_l=cv.glmnet(as.matrix(covariates), response, alpha=1,family="gaussian",
+lambda=seq(0,1,0.001))
 best_lambda = model_l$lambda.min
 plot(model_l)
 plot(model_l$lambda,model_l$cvm,xlab="lambda",ylab="Mean CV error")
 cat("Optimal lambda is :",best_lambda)
 
-m = cv.glmnet(as.matrix(covariates), response, alpha=1,family="gaussian",lambda=c(best_lambda,0.1353353))
+m = cv.glmnet(as.matrix(covariates), response, alpha=1,family="gaussian",
+lambda=c(best_lambda,0.1353353))
 cat("CV Error when lambda is ",m$lambda[1] ," =",m$cvm[1])
 cat(" and CV Error when lambda is ",m$lambda[2] ," =",m$cvm[2])
 
-model_optimallasso =  glmnet(as.matrix(covariates), response, alpha = 1, family = "gaussian", lambda = best_lambda)
+model_optimallasso =  glmnet(as.matrix(covariates), response, alpha = 1, 
+family = "gaussian", lambda = best_lambda)
 y = as.matrix(scale(test[,102]))
-ypred=predict(model_optimallasso, newx=as.matrix(scale(test[, 2:101])), type="response")
+ypred=predict(model_optimallasso, newx=as.matrix(scale(test[, 2:101])), 
+type="response")
 scatter.smooth(y,ypred)
 cat("coefficient of determination is ",
-    sum((ypred-mean(y))^2)/sum((y-mean(y))^2), "and MSE is ", mean((y-ypred)^2))
+    sum((ypred-mean(y))^2)/sum((y-mean(y))^2), "and MSE is ",
+    mean((y-ypred)^2))
 
 #7
-betas = as.vector((as.matrix(coef(model_optimallasso))[-1, ])) # removing the first row for intercept
+betas = as.vector((as.matrix(coef(model_optimallasso))[-1, ])) # removing the 
+#first row for intercept
 resid = response - (covariates %*% betas)
 sigma = sd(resid)
 
-ypred=predict(model_optimallasso, newx=as.matrix(scale(test[, 2:101])), type="response")
+ypred=predict(model_optimallasso, newx=as.matrix(scale(test[, 2:101])),
+type="response")
 set.seed(90000)
 y_gen = rnorm(108,ypred,sigma)
 scatter.smooth(y,y_gen)
-cat("coefficient of determination is ",sum((y_gen-mean(y))^2)/sum((y-mean(y))^2)," MSE is ",mean((y_gen - y)^2))
+cat("coefficient of determination is ",
+sum((y_gen-mean(y))^2)/sum((y-mean(y))^2)," MSE is ",mean((y_gen - y)^2))
 
 
 ```
