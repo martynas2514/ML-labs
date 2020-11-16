@@ -16,6 +16,11 @@ opts_chunk$set(tidy.opts=list(width.cutoff=40),tidy=TRUE)
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_chunk$set(cache = TRUE)
 ```
+# Statement of Contribution
+
+* Assignment 1 - Alejo Perez Gomez
+* Assignment 2 - Martynas Lukosevicius
+* Assignment 3 - Shwetha Vandagadde Chandramouly
 
 # Assignment 1
 
