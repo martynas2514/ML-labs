@@ -513,7 +513,7 @@ Here we are assuming that fat can be modeled as linear regression with channels 
 
 Underlying probalistic model is :
 $$\hat{y} = \beta_0 +\sum_{i = 1}^{100} \beta_i*x_i + \epsilon ,\\\epsilon \sim {\sf N}(0, \sigma^2)$$
-*$y$ = dependent variable 
+*$y$ = dependent variable (Fat)
 *$x_i$ = features (channel1 to channel100)
 *$\beta_0$ = y-intercept
 *$\beta_i$ = slope coefficient for each feature
