@@ -37,22 +37,18 @@ library(tree)
 dt_default = tree(y~.,data = train)
 dt_size = tree(y~.,data = train, control = tree.control(nrow(train),minsize = 7000))
 dt_dev = tree(y~.,data = train, control = tree.control(nrow(train),mindev = 0.0005))
-summary(dt_default)
-summary(dt_size)
-summary(dt_dev)
+```
+
+
+```{r, echo = FALSE}
+#summary(dt_default)
+#summary(dt_size)
+#summary(dt_dev)
 
 mce_default_train = summary(dt_default)$misclass[1]/summary(dt_default)$misclass[2]
 mce_size_train = summary(dt_size)$misclass[1]/summary(dt_size)$misclass[2]
 mce_dev_train = summary(dt_dev)$misclass[1]/summary(dt_dev)$misclass[2]
 
-mce_default_train
-mce_size_train
-mce_dev_train
-
-```
-
-For validation data
-```{r}
 y_default = predict(dt_default, validate, type = "class")
 y_size = predict(dt_size, validate, type = "class")
 y_dev = predict(dt_dev, validate, type = "class")
@@ -65,17 +61,31 @@ missclass = function(y,y1){
 mce_default_val = missclass(validate$y,y_default)
 mce_size_val = missclass(validate$y,y_size)
 mce_dev_val =  missclass(validate$y,y_dev)
-mce_default_val
-mce_size_val
-mce_dev_val
-# sensitive on data
+
 
 ```
-report the misclassification rates for the training and validation data. Which model is the best one among these three? Report how changing the deviance and node size affected the size of the trees and explain why.
+
+Training data missclassification rate:
+Default fit : `r mce_default_train`
+Min node size is 7000 fit : `r mce_size_train`
+Min deviance is .0005 fit : `r mce_dev_train`
+
+Validation data missclassification rate:
+Default fit : `r mce_default_val`
+Min node size is 7000 fit : `r mce_size_val`
+Min deviance is .0005 fit : `r mce_dev_val`
+
+Choosing the best of three fits : 
+Though the missclassification error was least for mindev=0.0005 fit ,it has large tree of 150 terminal nodes, this leads to a slightly overfit tree. As a result of this , on fitting the validation data , the missclassification error rate slightly increases in this.
+Model a and b , both have same missclassification error , however since the b has very small tree, we want to avoid the chances of underfit , hence we choose "a" as the best fit.
+But if we are allowed to find the optimal number of leaves to avoid overfitting, then c would be the best model.
+
+-----Report how changing the deviance and node size affected the size of the trees and explain why.
+
 
 ## 3
 Selecting optimal tree by training and validation
-```{r}
+```{r, echo = FALSE,fig.align="center"}
 train_score = validate_score = rep(0,52)
 for(i in 2:52){
   pruned_tree = prune.tree(dt_dev,best = i)
@@ -86,47 +96,66 @@ for(i in 2:52){
 plot(2:52, train_score[2:52], type="p", col="red", ylim =c(7000,12000))
 points(2:52, validate_score[2:52], type="p", col="blue")
 ```
-Optimal amount of leaves = 24
+Optimal amount of leaves = 37
 
-<<< which variables seem to be most important for decision making in this tree. Interpret the information provided by the tree structure (not everything but most important findings).
+```{r}
+optimal_tree = prune.tree(dt_dev, best = 37)
+plot(optimal_tree)
+text(optimal_tree, pretty = 0, cex = 0.5)
+```
+Variable : poutcome is the most important for decision making in this tree.
+
+Tree sturcture : 
+variable included = poutcome, month, contact, marital, day, pdays, age, balance, job and housing
+Number of leaves = 37
+First variable considered in the tree is "poutcome", the partition is made by taking the condition poutcome = failure, other or unknown, if this is true , the data goes to left side to the next condition on variable month. If the poutcome was not satisfied , ie say poutcome was "success" then the data flows to right part , where next node condition is on pdays < 94.5. The tree continues until the number of leaves are 37.
+
 
 Confusion matrix and missclassification rate for test data.
 
-```{r}
-optimal_tree = prune.tree(dt_dev, best = 36)
+```{r, echo = FALSE}
+
 optimal_pred = predict(optimal_tree, test, type = "class")
 confusion_matrix = table(test$y,optimal_pred)
-confusion_matrix
 missclassification_rate = missclass(test$y,optimal_pred)
-missclassification_rate
+
 ```
 
-```{r}
-plot(optimal_tree)
-text(optimal_tree)
-summary(optimal_tree)
-```
+confusion matrix : `r confusion_matrix`
+Missclassification rate : `r missclassification_rate`
+
+we can see that the missclassification rate for the test data hass reduced for the optimal tree. Hence this is a better fit compared to the previously tried tree fits.
 
 ## 4
 
-```{r}
+Loss Matrix : 
+
+```{r, echo = FALSE}
 loss_mat = t(matrix(c(0,1,5,0),2,2))
 row.names(loss_mat) = colnames(loss_mat) = c("no","yes")
 op = predict(optimal_tree, test)
 loss_fit = ifelse(loss_mat[1,2]*op[,1] > loss_mat[2,1]*op[,2] ,"no","yes")#1 is no , 2 is yes
 loss_confusion_matrix = table(test$y,loss_fit)
-
-loss_mat
-loss_confusion_matrix
-missclass(test$y,loss_fit)
-
+m = missclass(test$y,loss_fit)
+knitr::kable(loss_mat)
 ```
 
-Here in the loss function we can see that , penalty for predicting observed yes as no is 5 and no as yes is 1. So on applying loss function , as expected , the missclassification of an observed yes as no is reduced in the confusion matrix here. Previously observed yes predicted as no was 1227 , and now it is 780. However the missclassification error rate has increased.
+Confusion matrix :
+
+```{r,echo = FALSE}
+knitr::kable(loss_confusion_matrix)
+```
+
+Missclassification rate : `r m`
+
+Here in the loss function we can see that , penalty for predicting observed yes as no is 5 and no as yes is 1. So on applying loss function , as expected , the missclassification of an observed yes as no is reduced in the confusion matrix here. Previously observed yes predicted as no was 1227 , and now it is 745. However the missclassification error rate has increased.
+
+We can try different loss matrix(assigning the loss most suitable costs for the respective senario ) and choose the one which gives the lowest missclassification rate.
 
 ## 5
+
 Fitting naive bayes model
-```{r,warning=FALSE}
+```{r,warning=FALSE, echo = FALSE, fig.align="center"}
 library(e1071)
 naive_model = naiveBayes(y~., train)
 naive_y = predict(naive_model, test, type = "raw")
@@ -178,6 +207,8 @@ colnames(DT) = c("pi","TPR","FPR")
 #ROC curve
 plot(DT[,3],DT[,2],ylab = "TPR",xlab = "FPR", type = "l", col = "red")
 lines(NAIVE[,3],NAIVE[,2],col= "blue")
+title("ROC Curve")
+legend(0.4, 0.2, legend = c("Naive bayes","Optimal tree"), col=c("blue","red"), lty = c(1,1))
 
 ```
-
+Conclusion : Area under the curve is more for Optimal tree fit hence this is the best classifier.
