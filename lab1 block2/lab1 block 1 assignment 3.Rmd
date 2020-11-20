@@ -52,7 +52,7 @@ numberOfGenes <- model$nonzero[minError]
 listOfGenes  <- pamr.listgenes(model, mydata, bestTh)
 bestGenes <- mydata$genenames[as.vector(as.numeric(listOfGenes[1:2,1]))]
 ```
-Centroid plot shows distance from gene mean value to global mean value. Positive or negative shows direction to the global mean.  Yes, it can happen that all values for some gene in centroid plot are positivive. Number of genes selected when threshold = `r bestTh` : `r numberOfGenes`.
+Centroid plot shows distance from gene mean value to global mean value. Positive or negative shows if mean is greater or smaller than the global mean.  Yes, it can happen that all values for some gene in centroid plot are positivive. Number of genes selected when threshold = `r bestTh` : `r numberOfGenes`.
 
 
 ## 2. 
