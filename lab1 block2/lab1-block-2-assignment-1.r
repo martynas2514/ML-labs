@@ -116,7 +116,7 @@ plot(x1,x2,col=(y+1))
 
 missclass_large_sample(trainlabels_c,traindata_c,testdata_c,testlabels_c,12)
 
-#ask if it is fine to take sampsize 
+
 
 
 
