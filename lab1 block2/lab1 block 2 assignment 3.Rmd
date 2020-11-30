@@ -68,14 +68,14 @@ genenames <- colnames(test[ ,-ncol(test)])
 x <- t(test[ ,-ncol(test)])
 y=test[[ncol(test)]]
 testdata=list(x=x,y=as.factor(y),geneid=as.character(1:nrow(x)), genenames=genenames)
-confusionMatrix <- pamr.predict(model, testdata$x, threshold = bestTh)
+predictions <- pamr.predict(model, testdata$x, threshold = bestTh)
 
 ```
 
 ```{r , echo=FALSE}
 #knitr::kable(table(testdata$y,confusionMatrix))
 ```
-Test error: `r sum(testdata$y != confusionMatrix)`
+Test error rate: `r sum(testdata$y != predictions)/ length(predictions)`
 
 ## 3. 
 
@@ -104,13 +104,14 @@ res2 <- predict(svp, as.matrix(test[ ,-ncol(test)]))
 ```
 
 
-Table bellow shows test error and number of features used.
+Table bellow shows test error rate and number of features used.
 ```{r , echo=FALSE}
-results <- matrix(c(sum(testdata$y != confusionMatrix), numberOfGenes), nrow = 1)
-results <- rbind(results,c(sum(testdata$y != res1), cv.elastic$glmnet.fit$df[which(cv.elastic$glmnet.fit$lambda == cv.elastic$lambda.min)]))
-results <- rbind(results, c(sum(testdata$y != res2), nrow(mydata$x)))
+
+results <- matrix(c(signif(sum(testdata$y != predictions)/length(predictions),digits = 2), numberOfGenes), nrow = 1)
+results <- rbind(results,c(signif(sum(testdata$y != res1)/length(res1),digits = 2), cv.elastic$glmnet.fit$df[which(cv.elastic$glmnet.fit$lambda == cv.elastic$lambda.min)]))
+results <- rbind(results, c(signif(sum(testdata$y != res2)/length(res2),digits = 2), nrow(mydata$x)))
 row.names(results) <- c("NSC", "EN", "SVM")
-colnames(results) <- c("Test error", "N. features")
+colnames(results) <- c("Test error rate", "N. features")
 knitr::kable(results)
 ```
 I prefer Elastic net, because SVM might overfit and use a lot of parameters, NSC might have underfited.
