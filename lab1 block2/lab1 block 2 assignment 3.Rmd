@@ -108,7 +108,7 @@ Table bellow shows test error rate and number of features used.
 ```{r , echo=FALSE}
 
 results <- matrix(c(signif(sum(testdata$y != predictions)/length(predictions),digits = 2), numberOfGenes), nrow = 1)
-results <- rbind(results,c(signif(sum(testdata$y != res1)/length(res1),digits = 2), cv.elastic$glmnet.fit$df[which(cv.elastic$glmnet.fit$lambda == cv.elastic$lambda.min)]))
+results <- rbind(results,c(signif(sum(testdata$y != res1)/length(res1),digits = 2), cv.elastic$nzero[which(cv.elastic$glmnet.fit$lambda == cv.elastic$lambda.min)]))
 results <- rbind(results, c(signif(sum(testdata$y != res2)/length(res2),digits = 2), nrow(mydata$x)))
 row.names(results) <- c("NSC", "EN", "SVM")
 colnames(results) <- c("Test error rate", "N. features")
