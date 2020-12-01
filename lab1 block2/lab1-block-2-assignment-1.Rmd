@@ -68,6 +68,11 @@ Repeating the procedure for 1000 training datasets of size 100.
 missclass_large_sample = function(condition,ns = 25){
 mce_1 = mce_10 = mce_100 = c()
 set.seed(12345)
+  x1<-runif(1000)
+  x2<-runif(1000)
+  test<-cbind(x1,x2)
+  y<-as.numeric(eval(parse(text = condition)))
+  testlabels<-as.factor(y)
 for(i in 1:1000){
   
   x1<-runif(100)
@@ -82,12 +87,6 @@ for(i in 1:1000){
                        keep.forest = TRUE)
   rf_100 = randomForest(trainlabels~., data = train, ntree = 100, nodesize = ns,
                         keep.forest = TRUE)
-  
-  x1<-runif(1000)
-  x2<-runif(1000)
-  test<-cbind(x1,x2)
-  y<-as.numeric(eval(parse(text = condition)))
-  testlabels<-as.factor(y)
   
   y_1 = predict(rf_1,newdata = test)
   y_10 = predict(rf_10,test)
