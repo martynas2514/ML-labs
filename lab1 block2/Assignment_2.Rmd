@@ -23,7 +23,7 @@ Your task is to implement the EM algorithm for mixtures of multivariate Bernoull
 First, it will be necessary to define our function of density of probability corresponding to the Bernoulli distribution. Let $D$ be the dimensions of our vectors of observations $x_n$ and $\mu_k$. 
 $$Bernoulli(x_i,\mu_k)=\prod_{i=1}^{D}\mu_{ki}^{x_{i}}(1-\mu_{ki})^{1-x_{i}} $$
 
-As for our matrix $z_{nk}$, its components will be defined as follows, with their values $n$ comprised from 1 to N observations for $X$ and its values k from 1 to K, being K the number of mixture coefficients $\pi_k$. This will be the matrix of fractional component assignments.
+As for our matrix $z_{nk}$, its components will be defined as follows, with their values $n$ comprised from 1 to N observations for $X$ and its values k from 1 to K, being K the number of mixture components $\pi_k$. This will be the matrix of fractional component assignments.
 
 $$z_{nk} = \frac{\pi_k * Bernoulli (x_n,\mu_k)}{\sum_{k=1}^{K} \pi_k*Bernoulli(x_n , \mu_k)}$$
 Now, the log-likelihood function will be defined in this way:
@@ -33,6 +33,7 @@ After Applying MLE over each mixture components and weights, we obtain:
 $$ \hat{n_k}^{MLE} = \sum_{n=1}^N z_{nk} $$
 $$ \pi^{MLE}_k = \frac{\hat{n_k}}{N} $$
 $$ \mu_{ki}^{MLE} = \frac{\sum_{n=1}^N z_{nk}x_{ni}}{\hat{n}} $$
+After this statement, executions of our implementation will be shown for K=2,3,4.
 
 
 ```{r, echo=FALSE, out.width="50%"}
@@ -132,7 +133,7 @@ whole_process <- function(K){set.seed(1234567890)
   
   plot(llik[1:it], type="o")
   
-  cat("Here will be shown the mu (mixture component parameters) plot of this experiment with K = ", K)
+  cat("Here will be shown the mu (mixture weights parameters) plot of this experiment with K = ", K)
   if(K == 2){
     plot(mu[1,], type="o", col="blue", ylim=c(0,1))
     points(mu[2,], type="o", col="red")
@@ -165,4 +166,4 @@ colnames(table_mat) <- c("K", "number of Iterations", "Log-Likelihood Value")
 knitr::kable((table_mat))
 ```
 
-As we can see, 
+As we can see, creating 2 different clusters ($k=2$), results in a faster convergence, needing just 16 iterations. As K increases, the log-likelihood decreases. This could be explained from an overfitting-based approach, leading us to think that too many components could result in worse performance.
