@@ -4,6 +4,7 @@
 
 set.seed(1234567890)
 
+
 max_it <- 100 # max number of EM iterations
 min_change <- 0.1 # min change in log likelihood between two consecutive EM iterations
 N=1000 # number of training points
@@ -53,7 +54,7 @@ for(it in 1:max_it) {
   divisorz_1 <- matrix(nrow = dim(z)[1], ncol = dim(z)[2]); 
   for(i in 1:N){ # loop for multinomial matrix NxK  
     for(j in 1:K){
-      divisorz_1[i,j] <-dmultinom(x[i,], prob = mu[j,])
+      divisorz_1[i,j] <- prod((mu[j,]**x[i,])*((1-mu[j,])**(1-x[i,])))           
     }
   }
   
@@ -62,25 +63,35 @@ for(it in 1:max_it) {
   
   z <- (divisorz_2*divisorz_1)/(divisor_z)
   
-  n_estimators <- colSums(z) 
   
-  pi <- n_estimators/N 
-
-  for (j in 1:K){ # Let's set the new mu estimator through z (p(k|i))
-    
-    mu[j,] <- (1/n_estimators[j])*colSums(z[,j]*x)
-    
-    }
   #Log likelihood computation.
-  # Your code here
+  ln_pi <- log(divisorz_2)
+  z_loglike_part1 <- matrix(nrow = dim(z)[1], ncol = dim(z)[2]); 
+  for(i in 1:N){ # loop for multinomial matrix NxK  
+    for(j in 1:K){
+      z_loglike_part1[i,j] <- sum((log(mu[j,])*x[i,])+((log(1-mu[j,]))*(1-x[i,])))           
+    }
+  }
+  
+  llik[it] <- sum(rowSums((z_loglike_part1+ln_pi)*z))
   
   cat("iteration: ", it, "log likelihood: ", llik[it], "\n")
   flush.console() 
   # Stop if the log likelihood has not changed significantly
-  # Your code here
+  if((it != 1) && (abs(llik[it]-llik[it-1])<min_change)){
+    break
+  }
   
   #M-step: ML parameter estimation from the data and fractional component assignments
-  # Your code here
+  n_estimators <- colSums(z) 
+  
+  pi <- n_estimators/N 
+  
+  for (j in 1:K){ # Let's set the new mu estimator through z (p(k|i))
+    
+    mu[j,] <- (1/n_estimators[j])*colSums(z[,j]*x)
+    
+  }
 }
 
 pi
