@@ -33,7 +33,7 @@ pi <- vector(length = K) # mixing coefficients
 mu <- matrix(nrow=K, ncol=D) # conditional distributions
 llik <- vector(length = max_it) # log likelihood of the EM iterations
 
-# Random initialization of the paramters
+# Random initialization of the parameters
 pi <- runif(K,0.49,0.51)
 pi <- pi / sum(pi)
 for(k in 1:K) {
@@ -50,14 +50,33 @@ for(it in 1:max_it) {
   Sys.sleep(0.5)
   
   # E-step: Computation of the fractional component assignments
-  # Your code here
+  divisorz_1 <- matrix(nrow = dim(z)[1], ncol = dim(z)[2]); 
+  for(i in 1:N){ # loop for multinomial matrix NxK  
+    for(j in 1:K){
+      divisorz_1[i,j] <-dmultinom(x[i,], prob = mu[j,])
+    }
+  }
   
+  divisorz_2 <- matrix(pi, nrow=N, ncol=length(pi), byrow=TRUE) #pi's at the divisor
+  divisor_z <- rowSums(divisorz_2*divisorz_1)
+  
+  z <- (divisorz_2*divisorz_1)/(divisor_z)
+  
+  n_estimators <- colSums(z) 
+  
+  pi <- n_estimators/N 
+
+  for (j in 1:K){ # Let's set the new mu estimator through z (p(k|i))
+    
+    mu[j,] <- (1/n_estimators[j])*colSums(z[,j]*x)
+    
+    }
   #Log likelihood computation.
   # Your code here
   
   cat("iteration: ", it, "log likelihood: ", llik[it], "\n")
   flush.console() 
-  # Stop if the lok likelihood has not changed significantly
+  # Stop if the log likelihood has not changed significantly
   # Your code here
   
   #M-step: ML parameter estimation from the data and fractional component assignments
