@@ -1,0 +1,46 @@
+---
+title: "Lab3 Assignment 3"
+author: "Shwetha"
+date: "12/3/2020"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(neuralnet)
+set.seed(1234567890)
+Var <- runif(500, 0, 10)
+mydata <- data.frame(Var, Sin=sin(Var))
+tr <- mydata[1:25,] # Training
+te <- mydata[26:500,] # Test
+winit = runif(46,-1,1)
+nn = neuralnet(Sin~Var,tr,hidden = 15,startweights = winit)
+plot(nn)
+train_predict = predict(nn,tr)
+test_predict = predict(nn,te)
+mean(((te[,2]-test_predict)^2)/475)
+plot(tr, cex=2)
+points(te, col = "blue", cex=1)
+points(te[,1],predict(nn,te), col="red", cex=1)
+```
+```{r}
+set.seed(1234567890)
+Var <- runif(500, 0, 20)
+newdata <- data.frame(Var, Sin=sin(Var))
+new_predict = predict(nn,newdata)
+plot(newdata,col="red", ylim=c(-5,5))
+points(newdata$Var,new_predict,col="blue")
+
+```
+```{r}
+set.seed(1234567890)
+Var <- runif(500, 0, 20)
+newdata <- data.frame(Var, Sin=sin(Var))
+w = runif(2,-1,1)
+nn = neuralnet(Var~Sin,newdata,hidden = 1,startweights = w)
+plot(newdata, col = "blue", cex=1,ylim = c(-2,15),xlim =c(-1,15))
+points(newdata[,2],predict(nn,newdata), col="red", cex=1)
+```
