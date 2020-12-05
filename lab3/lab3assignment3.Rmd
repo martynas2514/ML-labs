@@ -37,10 +37,10 @@ points(newdata$Var,new_predict,col="blue")
 ```
 ```{r}
 set.seed(1234567890)
-Var <- runif(500, 0, 20)
+Var <- runif(500, 0, 10)
 newdata <- data.frame(Var, Sin=sin(Var))
 w = runif(2,-1,1)
 nn = neuralnet(Var~Sin,newdata,hidden = 1,startweights = w)
 plot(newdata, col = "blue", cex=1,ylim = c(-2,15),xlim =c(-1,15))
-points(newdata[,2],predict(nn,newdata), col="red", cex=1)
+points(predict(nn,newdata), newdata[,2],col="red", cex=1)
 ```

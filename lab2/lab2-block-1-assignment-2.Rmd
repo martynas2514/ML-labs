@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Assignment 2
 
-## 1
+## 1.
 Partitioning the data into train , test and validation.
 ```{r}
 bank = read.csv("C:/Users/vcshw/Machine Learning and Stats/Sem1/Machine learning/lab/bank-full.csv", header = TRUE, sep = ";",stringsAsFactors = TRUE)
@@ -29,7 +29,7 @@ validate=d2[-id2,]
 
 ```
 
-## 2
+## 2.
 Fitting decision tree to training data 
 
 ```{r, warning=FALSE}
@@ -66,24 +66,32 @@ mce_dev_val =  missclass(validate$y,y_dev)
 ```
 
 Training data missclassification rate:
+
 Default fit : `r mce_default_train`
+
 Min node size is 7000 fit : `r mce_size_train`
+
 Min deviance is .0005 fit : `r mce_dev_train`
 
+
 Validation data missclassification rate:
+
 Default fit : `r mce_default_val`
+
 Min node size is 7000 fit : `r mce_size_val`
+
 Min deviance is .0005 fit : `r mce_dev_val`
 
+
 Choosing the best of three fits : 
-Though the missclassification error was least for mindev=0.0005 fit ,it has large tree of 150 terminal nodes, this leads to a slightly overfit tree. As a result of this , on fitting the validation data , the missclassification error rate slightly increases in this.
+Though the missclassification error was least for mindev=0.0005 fit ,it has large tree of 150 terminal nodes, this leads to a slightly overfit tree. As a result of this , on fitting the validation data , the missclassification error rate slightly increases more in this when compared to other two trees.
 Model a and b , both have same missclassification error , however since the b has very small tree, we want to avoid the chances of underfit , hence we choose "a" as the best fit.
 But if we are allowed to find the optimal number of leaves to avoid overfitting, then c would be the best model.
 
------Report how changing the deviance and node size affected the size of the trees and explain why.
+In our case , setting the deviance very small ie 0.0005, made the tree grow more deeper as a large tree with 150 terminal nodes , this did reduce the missclassification on the training data, but ended up overfitting for validation data. 
 
 
-## 3
+## 3.
 Selecting optimal tree by training and validation
 ```{r, echo = FALSE,fig.align="center"}
 train_score = validate_score = rep(0,52)
@@ -113,20 +121,23 @@ First variable considered in the tree is "poutcome", the partition is made by ta
 
 Confusion matrix and missclassification rate for test data.
 
+confusion matrix :
+
 ```{r, echo = FALSE}
 
 optimal_pred = predict(optimal_tree, test, type = "class")
 confusion_matrix = table(test$y,optimal_pred)
 missclassification_rate = missclass(test$y,optimal_pred)
+knitr::kable(confusion_matrix)
 
 ```
 
-confusion matrix : `r confusion_matrix`
+
 Missclassification rate : `r missclassification_rate`
 
-we can see that the missclassification rate for the test data hass reduced for the optimal tree. Hence this is a better fit compared to the previously tried tree fits.
+we can see that the misclassification rate for the test data has reduced for the optimal tree. Hence this is a better fit compared to the previously tried tree fits.
 
-## 4
+## 4.
 
 Loss Matrix : 
 
@@ -148,14 +159,14 @@ knitr::kable(loss_confusion_matrix)
 
 Missclassification rate : `r m`
 
-Here in the loss function we can see that , penalty for predicting observed yes as no is 5 and no as yes is 1. So on applying loss function , as expected , the missclassification of an observed yes as no is reduced in the confusion matrix here. Previously observed yes predicted as no was 1227 , and now it is 745. However the missclassification error rate has increased.
+Here in the loss function we can see that , penalty for predicting observed yes as no is 5 and no as yes is 1. So on applying loss function , as expected , the misclassification of an observed yes as no is reduced in the confusion matrix here. Previously observed yes predicted as no was 1347 , and now it is 745. However the missclassification error rate has increased.
 
-We can try different loss matrix(assigning the loss most suitable costs for the respective senario ) and choose the one which gives the lowest missclassification rate.
+We can try different loss matrix (assigning the loss function with suitable costs for the respective senario ) and choose the one which gives the lowest misclassification rate.
 
-## 5
+## 5.
 
-Fitting naive bayes model
-```{r,warning=FALSE, echo = FALSE, fig.align="center"}
+Fitting naive bayes model, computing TPR and FPR for both models and plotting the ROC curve
+```{r,warning=FALSE, echo = FALSE, fig.align="left"}
 library(e1071)
 naive_model = naiveBayes(y~., train)
 naive_y = predict(naive_model, test, type = "raw")
@@ -208,7 +219,7 @@ colnames(DT) = c("pi","TPR","FPR")
 plot(DT[,3],DT[,2],ylab = "TPR",xlab = "FPR", type = "l", col = "red")
 lines(NAIVE[,3],NAIVE[,2],col= "blue")
 title("ROC Curve")
-legend(0.4, 0.2, legend = c("Naive bayes","Optimal tree"), col=c("blue","red"), lty = c(1,1))
+legend(0.3, 0.2, legend = c("Naive bayes","Optimal tree"), col=c("blue","red"), lty = c(1,1))
 
 ```
 Conclusion : Area under the curve is more for Optimal tree fit hence this is the best classifier.
