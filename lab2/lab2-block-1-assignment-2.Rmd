@@ -84,11 +84,12 @@ Min deviance is .0005 fit : `r mce_dev_val`
 
 
 Choosing the best of three fits : 
-Though the missclassification error was least for mindev=0.0005 fit ,it has large tree of 150 terminal nodes, this leads to a slightly overfit tree. As a result of this , on fitting the validation data , the missclassification error rate slightly increases more in this when compared to other two trees.
-Model a and b , both have same missclassification error , however since the b has very small tree, we want to avoid the chances of underfit , hence we choose "a" as the best fit.
-But if we are allowed to find the optimal number of leaves to avoid overfitting, then c would be the best model.
+Though the misclassification error was least for mindev=0.0005 fit on train data ,it has large tree of 150 terminal nodes, this leads to a overfit tree. As a result of this , on fitting the validation data , the misclassification error rate increases more in this when compared to other two trees.
+Model a and b , both have same misclassification error , however since the "b" has only 5 terminal nodes whereas "a" has 6 terminal nodes , its better to choose the simpler model ie b. But if we are allowed to find the optimal number of leaves to avoid overfitting, then c would be the best model.
 
-In our case , setting the deviance very small ie 0.0005, made the tree grow more deeper as a large tree with 150 terminal nodes , this did reduce the missclassification on the training data, but ended up overfitting for validation data. 
+In our case , setting the deviance very small ie 0.0005, made the tree grow more deeper as a large tree with 150 terminal nodes , this did reduce the misclassification on the training data, but ended up overfitting for validation data. 
+
+Effect of deviance and nodesize on the tree size : Decreasing the deviance leades to increase in tree size. Increase in the nodesize leads to decrease in the tree size.
 
 
 ## 3.
@@ -105,10 +106,10 @@ plot(2:52, train_score[2:52], type="p", col="red", ylim =c(7000,12000), xlab = "
 points(2:52, validate_score[2:52], type="p", col="blue")
 legend("topright", c("validation", "test"), fill=c("blue", "red"))
 ```
-Optimal amount of leaves = 37
+Optimal amount of leaves = 36
 
 ```{r}
-optimal_tree = prune.tree(dt_dev, best = 37)
+optimal_tree = prune.tree(dt_dev, best = 36)
 plot(optimal_tree)
 text(optimal_tree, pretty = 0, cex = 0.5)
 ```
