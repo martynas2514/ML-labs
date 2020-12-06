@@ -457,7 +457,7 @@ Conclusion : Area under the curve is more for Optimal tree fit hence this is the
 First we will scale all the variables and implement the PCA. We will not include the variable State as it is categorical data and we will only apply scaling and PCA on continuous variables.
 
 ```{r ,echo = FALSE, fig.align='center', warning=FALSE}
-data_com=read.csv2("C:/Users/alejo/Documents/GitHub_Repos/ML-labs/lab2/communities.csv", sep = ",")
+data_com=read.csv2("communities.csv", sep = ",")
 library(ggplot2)
 library(ggfortify)
 ```
@@ -578,8 +578,8 @@ points(data$PC1, predicted_violence) # plot fitted line
 
 # plot confidence bands
 
-points(data$PC1, predicted_violence + e$point[2,], type="l", col="red")
-points(data$PC1, predicted_violence - e$point[1,], type="l", col="red")
+points(data$PC1, e$point[2,], type="l", col="red")
+points(data$PC1, e$point[1,], type="l", col="red")
 
 ```
 
