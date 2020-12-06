@@ -539,7 +539,9 @@ ggplot(X_data, aes(X.pca$scores[,1], ViolentCrimesPerPop)) +
 
 ## 4.
 
-Parametric Bootstrap will be used in this point to estimate the confidence and prediction bands from the model in section 3. In case of the prediction interval, the plotted lines envelop closely the fitted predictions and fall inside the cloud of point observations, bordering the edges though. The plot of confidence interval shows lines that imitate  the curve the fitted predictions as well. The lines are closer to the predicted values at the beginning, whereas as ViolentCrimesPerPop increases they move away. The bottom line is straight, yet to be fixed. 
+Parametric Bootstrap will be used in this point to estimate the confidence and prediction bands of the model in section 3. The prediction interval is a type of confidence interval used for predictions in regression procedures. It represents the range of values that predicts the value of a new observation, based on our existing model, where our predicted value is expected to fall. Meanwhile, the confidence interval is an estimated range of values based on what is observed centered in a sampled parameter.
+
+As for the prediction interval (green), the plotted lines envelop and border the cloud of point observations. The plot of confidence interval, in turn, shows lines that emulate the curve of the fitted predictions as well, approaching it far closer, constraining the limits of possible predictions with this quadratic model. The lines (red) are closer to the predicted values in middle range of the slope, whereas as ViolentCrimesPerPop increases or decreases.
 
 ```{r , out.width = "70%", echo= FALSE, message=FALSE, warning=FALSE, fig.align='center'}
 
@@ -573,17 +575,13 @@ e=envelope(res) # compute confidence bands
 fit=mle
 predicted_violence=predict(fit)
 
-plot(data$PC1, data$ViolentCrimesPerPop, pch=21, bg="orange", main="PC1 vs ViolentCrimesPerPop, Confidence interval")
+plot(data$PC1, data$ViolentCrimesPerPop, pch=21, bg="orange", main="PC1 vs ViolentCrimesPerPop, Confidence/Prediction interval")
 points(data$PC1, predicted_violence) # plot fitted line
 
 # plot confidence bands
 
 points(data$PC1, e$point[2,], type="l", col="red")
 points(data$PC1, e$point[1,], type="l", col="red")
-
-```
-
-```{r , out.width = "70%", echo= FALSE, message=FALSE, warning=FALSE, fig.align='center'}
 
 ####### Prediction interval ########
 
@@ -599,17 +597,13 @@ f1=function(data1){
                    sd(mle$residuals))
   return(predictedP)
 }
-res=boot(data, statistic=f1, R=10000, mle=mle,ran.gen=rng, sim="parametric")
+res2=boot(data, statistic=f1, R=10000, mle=mle,ran.gen=rng, sim="parametric")
 
-e = envelope(res) 
-fit = lm(ViolentCrimesPerPop~poly(PC1, degree=2), data=data)
-violent_predict = predict(fit)
+e2 = envelope(res2) 
 
-plot(data$PC1, data$ViolentCrimesPerPop, pch=21, bg="orange", main="PC1 vs ViolentCrimesPerPop, Prediction interval")
-points(data$PC1, violent_predict) #plot fitted line
 
-points(data$PC1, e$point[2,], type="l", col="red") 
-points(data$PC1, e$point[1,], type="l", col="red")
+points(data$PC1, e2$point[2,], type="l", col="green") 
+points(data$PC1, e2$point[1,], type="l", col="green")
 
 
 ```
