@@ -556,15 +556,15 @@ rng <- function(data, mle) {
   data1=data.frame(ViolentCrimesPerPop=data$ViolentCrimesPerPop, PC1=data$PC1)
   n=length(data$PC1)
   #generate new Price
-  data1$Price=rnorm(n, predict(mle, newdata=data1), sd(mle$residuals))
+  data1$ViolentCrimesPerPop=rnorm(n, predict(mle, newdata=data1), sd(mle$residuals))
   return(data1)
 }
 
 f1=function(data1){
   res=lm(ViolentCrimesPerPop ~ poly(PC1, degree = 2), data=data1) #fit linear model
   #predict values for all Area values from the original data
-  priceP=predict(res,newdata=data)
-  return(priceP)
+  y=predict(res,newdata=data)
+  return(y)
 }
 
 res=boot(data, statistic=f1, R=1000, mle=mle,ran.gen=rng, sim="parametric")
