@@ -43,7 +43,7 @@ return(list(data = y1, mean = unname(mean1), covariance = covar, prior = prior, 
 
 
 pooledcov <- function(a,b,c){
-  temp <- (a$cov * a$n) + (b$cov * b$n) + (b$cov * b$n)
+  temp <- (a$cov * a$n) + (b$cov * b$n) + (c$cov * c$n)
   return(temp/dim(iris)[1])
 }
 
@@ -147,6 +147,8 @@ predictLDA <- function(x){
   values <- c(discrim(x, Setosa), discrim(x,Versicolor), discrim(x,virginica))
   return(which.max(values))
 }
+
+
 
 res <- cbind(iris[1:2],cut(apply(iris[1:2], 1, predictLDA),3, c("setosa","versicolor","virginica")))
 colnames(res) <- c("Sepal.Length", "Sepal.Width", "Species")
