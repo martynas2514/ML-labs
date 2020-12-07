@@ -88,4 +88,4 @@ Taking into account all arguments, filter2 should be selected as it was trained 
 
 ## 2. What is the estimate of the generalization error of the model selected ? err0, err1, err2 or err3 ? Why ?
 
-Generalization error is the error of the model on data which was not used for training, so err3 is not a generalization error. For chosen model generalization error is err2 - `r err2`
+Generalization error is the error of the model on data which was not used for training, so err3 is not a generalization error. For chosen model (filter2) generalization error is err2 - `r err2`
