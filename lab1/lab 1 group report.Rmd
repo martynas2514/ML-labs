@@ -300,7 +300,7 @@ As a conclusion, the choice of cross-entropy error is such a sensible procedure 
 ## 1.
 
 Model:  
-$\hat y \sim N(w_0 +w^tX_i, \sigma^2)$ where $w \sim N(0, \frac{\sigma^2}{\lambda})$
+$\hat y \sim N(w_0 +w^tX, \sigma^2)$ where $w \sim N(0, \frac{\sigma^2}{\lambda})$
 
 * $w$ - weights
 * $X$ - features
@@ -326,6 +326,7 @@ $\hat y \sim N(w_0 +w^tX_i, \sigma^2)$ where $w \sim N(0, \frac{\sigma^2}{\lambd
 <!-- Model: -->
 
 <!-- $$ p(w|D) \propto \frac 1 {(\sqrt{2 \pi \sigma^2})^n } e^ - \sum^n_{i = 1} \frac{(y_i - w^TX_i)^2} {2\sigma^2}  * \frac 1 {\sqrt{2 \pi \frac {\sigma^2 }{\lambda}} } e^ - { \frac {(w)^2}{2 \frac {\sigma^2}{\lambda}}} = \frac{\sqrt \lambda}{(\sqrt{2 \pi \sigma^2})^{n+1}} e^{- \frac{\sum^n_{i=1} (y_i - w^TX_i)^2 + w^2\lambda}{2\sigma^2}} $$ -->
+
 ## 2.
 
 Scaling data:
@@ -371,10 +372,10 @@ return(part1 - (res/(2*(sigma^2))))
 
 ### b)
 
-Ridge part $\sim$ log prior, where $\tau = { \frac {\sigma^2} \lambda}$:
+Ridge part $\sim$ log prior, where $\tau = { \frac {\sigma^2} \lambda},$ and $p$ number of weights:
 
 
-$$ log(prior) =  -{1 \over 2}log({2 \pi \tau}) - { \frac {(w)^2}{2 \tau}} $$
+$$ log(prior) =  -{p \over 2}log({2 \pi \tau}) - { \frac {\sum^p(w_i)^2}{2 \tau}} $$
 
 function returns $- log(posterior)$
 
@@ -383,11 +384,14 @@ function returns $- log(posterior)$
 ridge <- function(x, lambda){
   w <- x[1:16]
   sigma <- x[17]
+  p <- length(w)
   tau <- sigma^2 / lambda
   part1 <-  (-1/2) * log(2* pi * tau)
-  part2 <- (w %*% w) / (2* tau)
+  part2 <- (w ^ 2) / (2* tau)
   ridge <- part1 - part2
-  return( - (loglikelihood(w,sigma) + ridge))
+  # ridge <- lambda * (w %*% w)
+  return( -(loglikelihood(w,sigma) + sum(ridge)))
+  #return(sum(ridge))
 }
 
 ```
@@ -397,7 +401,7 @@ ridge <- function(x, lambda){
 function to predict weights ($w$) and $\sigma$
 ```{r}
 ridgeOpt <- function(lambda){
-  x <- rep(1,17)
+  x <- c(rep(1,16),1)
   a <- optim(x ,ridge, method = "BFGS", lambda = lambda)
   w <- a$par[1:16]
   sigma <- a$par[17]
@@ -478,8 +482,8 @@ loglikelihood <- function(w, sigma){
 n <- dim(train)[1]
 part1 <- -(n/ 2) * log(2 * pi*(sigma^2))
 
-y <- parkinsons.scaled[, 1]
-x <- parkinsons.scaled[, -1]
+y <- train[, 1]
+x <- train[, -1]
 res <- sum((y - (x %*% w))^2)
 
 return(part1 - (res/(2*(sigma^2))))
@@ -500,7 +504,7 @@ res <- which.min(AIC)
 res <- ifelse(res == 1, "1", ifelse(res == 2, 100, 1000))
 ```
 
-The optimal model is with lowest AIC score, in this case its a model with $\lambda =$  `r res`. Hold out method requires to divide data into 3 parts, which wont allow to use all data for training, its not the case with AIC.
+The optimal model is with lowest AIC score, in this case its a model with $\lambda =$  `r res`. Hold out method requires to divide data into 3 parts: train,validation, test, which wont allow to use all data for training, its not the case with AIC, where its use on training + validation data 
 
 
 # Assignment 3
