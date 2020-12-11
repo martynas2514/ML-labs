@@ -25,7 +25,7 @@ test=data[-id,]
 
 Here we are assuming that fat can be modeled as linear regression with channels as features.
 
-Underlying probalistic model is :
+Underlying probalistic model is :--- correction : see ols model in slide 1d
 $$\hat{y} = \beta_0 +\sum_{i = 1}^{100} \beta_i*x_i + \epsilon ,\\\epsilon \sim {\sf N}(0, \sigma^2)$$
 *$y$ = dependent variable 
 *$x_i$ = features (channel1 to channel100)
@@ -76,9 +76,9 @@ $$\sum_{i = 1}^{n}\left(Y_i-\beta_0-\sum_{j = 1}^{p}\beta_jX_{ji}\right)^2+\lamb
 Fitting LASSO regression model to training data
 
 ```{r}
-covariates = scale(train[ ,2:101])
-response = scale(train[ ,102])
-model_lasso = glmnet(as.matrix(covariates), response, alpha = 1, family = "gaussian")
+covariates = as.matrix(train[ ,2:101])
+response = as.matrix(train[ ,102])
+model_lasso = glmnet((covariates), response, alpha = 1, family = "gaussian")
 plot(model_lasso, xvar = "lambda", label = T)
 ```
 
@@ -103,8 +103,8 @@ return(DOF)
 }
 lambda_values = model_lasso$lambda
 degrees_of_freedom = c()
-for(i in 1:length(lambda_values)){
-degrees_of_freedom[i] = df(lambda_values[i])
+for(i in lambda_values){
+degrees_of_freedom = cbind(degrees_of_freedom,df(i))
 }
 plot(lambda_values, degrees_of_freedom)
 ```
@@ -114,9 +114,9 @@ Here as expected we can see that degrees of freedom decreases as penalty factor 
 Fitting ridge model
 
 ```{r,echo = FALSE}
-covariates = scale(train[ ,2:101])
-response = scale(train[ ,102])
-model_ridge = glmnet(as.matrix(covariates), response, alpha = 0, family = "gaussian")
+covariates = as.matrix(train[ ,2:101])
+response = as.matrix(train[ ,102])
+model_ridge = glmnet((covariates), response, alpha = 0, family = "gaussian")
 plot(model_ridge, main = "RIDGE", xvar = "lambda", label = T)
 ```
 
@@ -126,7 +126,7 @@ In both lasso and ridge we can see that the value of coefficents decreases with 
 To find optimal lambda, we use cross validation.
 
 ```{r,echo=FALSE}
-model_l=cv.glmnet(as.matrix(covariates), response, alpha=1,family="gaussian",lambda=seq(0,1,0.001))
+model_l=cv.glmnet((covariates), response, alpha=1,family="gaussian")
 best_lambda = model_l$lambda.min
 plot(model_l)
 plot(model_l$lambda,model_l$cvm,xlab="lambda",ylab="Mean CV error")
@@ -139,7 +139,7 @@ Best lambda is given as zero for the above model , this makes sense as we can se
 Fitting the model for 0 and log_lambda = -2 for comparision.
 
 ```{r}
-m = cv.glmnet(as.matrix(covariates), response, alpha=1,family="gaussian",lambda=c(best_lambda,0.1353353))
+m = cv.glmnet((covariates), response, alpha=1,family="gaussian",lambda=c(best_lambda,0.1353353))
 ```
 ```{r,echo = FALSE}
 cat("CV Error when lambda is ",m$lambda[1] ," =",m$cvm[1])
@@ -151,9 +151,9 @@ Also in lambda vrs Mean Cv error plot , we can see that for lambda = 0.1353353 (
 Plot for Y vrs predicted Y for test data using optimal lambda
 
 ```{r,echo = FALSE}
-model_optimallasso =  glmnet(as.matrix(covariates), response, alpha = 1, family = "gaussian", lambda = best_lambda)
-y = as.matrix(scale(test[,102]))
-ypred=predict(model_optimallasso, newx=as.matrix(scale(test[, 2:101])), type="response")
+model_optimallasso =  glmnet((covariates), response, alpha = 1, family = "gaussian", lambda = best_lambda)
+y = as.matrix((test[,102]))
+ypred=predict(model_optimallasso, newx=as.matrix((test[, 2:101])), type="response")
 scatter.smooth(y,ypred)
 cat("coefficient of determination is ",
 sum((ypred-mean(y))^2)/sum((y-mean(y))^2), "and MSE is ", mean((y-ypred)^2))
@@ -171,7 +171,7 @@ betas = as.vector((as.matrix(coef(model_optimallasso))[-1, ])) # removing the fi
 resid = response - (covariates %*% betas)
 sigma = sd(resid)
 
-ypred=predict(model_optimallasso, newx=as.matrix(scale(test[, 2:101])), type="response")
+ypred=predict(model_optimallasso, newx=as.matrix((test[, 2:101])), type="response")
 set.seed(90000)
 y_gen = rnorm(108,ypred,sigma)
 scatter.smooth(y,y_gen)
