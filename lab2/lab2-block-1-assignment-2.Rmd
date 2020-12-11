@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## 1.
 Partitioning the data into train , test and validation.
 ```{r}
-bank = read.csv("C:/Users/vcshw/Machine Learning and Stats/Sem1/Machine learning/lab/bank-full.csv", header = TRUE, sep = ";",stringsAsFactors = TRUE)
+bank = read.csv("bank-full.csv", header = TRUE, sep = ";",stringsAsFactors = TRUE)
 
 bank = bank[,-12]
 n = nrow(bank)
@@ -102,8 +102,9 @@ for(i in 2:52){
   train_score[i] = deviance(pruned_tree)
   validate_score[i] = deviance(pred)
 }
-plot(2:52, train_score[2:52], type="p", col="red", ylim =c(7000,12000))
+plot(2:52, train_score[2:52], type="p", col="red", ylim =c(7000,12000), xlab = "# terminal nodes", ylab = "deviance")
 points(2:52, validate_score[2:52], type="p", col="blue")
+legend("topright", c("validation", "test"), fill=c("blue", "red"))
 ```
 Optimal amount of leaves = 36
 
