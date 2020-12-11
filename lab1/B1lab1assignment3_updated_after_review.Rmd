@@ -117,7 +117,7 @@ ridge <- function(x, lambda){
 function to predict weights ($w$) and $\sigma$
 ```{r}
 ridgeOpt <- function(lambda){
-  x <- c(rep(1,16),1)
+  x <- c(rep(0,16),1)
   a <- optim(x ,ridge, method = "BFGS", lambda = lambda)
   w <- a$par[1:16]
   sigma <- a$par[17]
