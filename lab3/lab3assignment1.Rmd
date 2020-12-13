@@ -44,7 +44,7 @@ hour_kernel <- function(subset, interest, h) {
 
 ```
 
-```{r, out.width = '50%', out.height= = '50%'}
+```{r, out.width = '50%', out.height= '50%'}
 ### Kernel plotting ###
 distance_kernel_plot <- function(x, h){
   y_val <- exp(-(x/h)^2)
@@ -140,11 +140,11 @@ compute_temp <- function(st, input){
 }
 ```
 
-```{r}
+```{r, echo=FALSE, warnings=F}
 temp <- compute_temp(st, input)
 
 ```
-```{r}
+```{r, echo=FALSE, warnings=FALSE}
 temp <- data.frame(temp)
 temp$time <- times
 
