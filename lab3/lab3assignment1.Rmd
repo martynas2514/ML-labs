@@ -85,7 +85,7 @@ a <- 58.4274
 b <- 14.826
 
 
-date <- "2013-11-04" # The date to predict (up to the students)
+date <- "2013-07-24" # The date to predict (up to the students)
 
 times <- c("04:00:00", "06:00:00", "08:00:00", "10:00:00", "12:00:00", "14:00:00", "16:00:00",         "18:00:00", "20:00:00", "22:00:00", "24:00:00")
 
@@ -145,11 +145,15 @@ temp <- compute_temp(st, input)
 
 ```
 ```{r}
+temp <- data.frame(temp)
+temp$time <- times
 
-ggplot() +
-  geom_point(aes(x=times, y=temp$kernel_summation), color="blue") +
-  geom_point(aes(x=times, y=temp$kernel_product), color="red") +
-  #scale_x_continuous(breaks = seq(2,24,2))+
-  labs(title = "Air Temperature Predeiction", x = "Hour Time", y = "T ºC")
+library(reshape2)
+
+dat = melt(temp)
+
+ggplot(aes(x = time, y = value, color = variable), data = dat) +  
+      geom_point() + geom_line()+ theme(axis.text.x = element_text(angle = -45))
+
 
 ```
