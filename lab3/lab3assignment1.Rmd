@@ -12,6 +12,64 @@ knitr::opts_chunk$set(echo = TRUE)
 # 1
 ##Kernel methods
 ``` {r }
+### Functions ###
+library(ggplot2)
+filter_hours <- function(df, hour) {
+  df <- df[!(as.numeric(difftime(strptime(df$time, 
+                  format = "%H:%M:%S"), strptime(hour, format = "%H:%M:%S"))) > 0),]
+  df
+}
+
+filter_day_Data <- function(df, day){
+  df <- df[as.Date(df$date) < as.Date(day),]
+  df
+} 
+```
+
+```{r}
+### Kernels ###
+
+distance_kernel <- function(subset, interest, h){
+  exp(-(distHaversine(data.frame(subset$longitude, subset$latitude), interest)/(h*1000))^2)
+}
+
+day_kernel <- function(subset, interest, h){
+  exp(-((as.numeric(as.Date(subset$date) - as.Date(interest), unit="days"))/h)^2)
+}
+
+hour_kernel <- function(subset, interest, h) {
+  exp(-(as.numeric(difftime(strptime(subset$time , format = "%H:%M:%S"), 
+                        strptime(interest , format = "%H:%M:%S"), units = "hours"))/h)^2)
+}
+
+```
+
+```{r, out.width = '50%', out.height= = '50%'}
+### Kernel plotting ###
+distance_kernel_plot <- function(x, h){
+  y_val <- exp(-(x/h)^2)
+  plot(x = x, y = y_val, type="l", ylab = "distance kernel")
+}
+
+day_kernel_plot <- function(x, h){
+  y_val <- exp(-(x/h)^2)
+  plot(x = x, y = y_val, type="l", ylab = "day kernel")
+
+}
+
+hour_kernel_plot <- function(x, h) {
+  y_val <- exp(-(x/h)^2)
+  plot(x = x, y = y_val, type="l", ylab = "hour kernel")
+
+}
+
+distance_kernel_plot(seq(0,300000,1),100000)
+day_kernel_plot(seq(0,30,1),10)
+hour_kernel_plot(seq(0,24,1),5)
+```
+
+```{r}
+### Initial values ###
 
 set.seed(1234567890)
 library(geosphere)
@@ -19,14 +77,79 @@ stations <- read.csv("stations.csv")
 temps <- read.csv("temps50k.csv")
 st <- merge(stations,temps,by="station_number")
 
-h_distance <- # These three values are up to the students
-h_date <-
-h_time <-
-a <- 58.4274 # The point to predict (up to the students)
+h_distance <- 100
+h_date <- 10
+h_time <- 5
+
+a <- 58.4274 
 b <- 14.826
+
+
 date <- "2013-11-04" # The date to predict (up to the students)
-times <- c("04:00:00", "06:00:00", ..., "24:00:00")
-temp <- vector(length=length(times))
-# Students’ code here
-plot(temp, type="o")
+
+times <- c("04:00:00", "06:00:00", "08:00:00", "10:00:00", "12:00:00", "14:00:00", "16:00:00",         "18:00:00", "20:00:00", "22:00:00", "24:00:00")
+
+temp <- list(kernel_summation=vector(length=length(times)), kernel_product= vector(length=length(times)))
+
+input <- list(temp = temp, 
+              times=times, 
+              input_date=date, 
+              lat_lon=c(b,a), 
+              h_distance=h_distance,
+              h_date=h_date,
+              h_time=h_time)
+
+```
+
+```{r}
+### Algorithm of Kernel computation ###
+
+compute_temp <- function(st, input){
+  
+  # Get the input variables
+  temp <- input$temp
+  times <- input$times
+  input_date <- input$input_date
+  lat_lon <- input$lat_lon
+  h_distance <- input$h_distance
+  h_date <- input$h_date
+  h_time<- input$h_time
+  
+  # Filter posterior days
+  st_filtered <- filter_day_Data(df = st, day = input_date)
+  
+  # Compute kernel for km and day distance
+  kernel_result_distance <- distance_kernel(st_filtered, lat_lon, h_distance)
+  kernel_result_day <- day_kernel(st_filtered, input_date, h_date)
+  
+  # Computation of hour kernel results by iteration
+  for (i in 1:length(times)){
+    
+    kernel_result_hour_i <- hour_kernel(st_filtered, times[i], h_time)
+    kernel_summation_i <- kernel_result_distance + kernel_result_day + kernel_result_hour_i
+    kernel_product_i <- kernel_result_distance * kernel_result_day * kernel_result_hour_i
+    
+    temp$kernel_summation[i] <- sum(kernel_summation_i  %*%                st_filtered$air_temperature)/sum(kernel_summation_i)
+    
+    temp$kernel_product[i] <- sum(kernel_product_i %*%    st_filtered$air_temperature)/sum(kernel_product_i)
+  }
+  
+  temp
+  
+  
+}
+```
+
+```{r}
+temp <- compute_temp(st, input)
+
+```
+```{r}
+
+ggplot() +
+  geom_point(aes(x=times, y=temp$kernel_summation), color="blue") +
+  geom_point(aes(x=times, y=temp$kernel_product), color="red") +
+  #scale_x_continuous(breaks = seq(2,24,2))+
+  labs(title = "Air Temperature Predeiction", x = "Hour Time", y = "T ºC")
+
 ```
