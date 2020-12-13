@@ -270,7 +270,7 @@ Generalization error is the error of the model on data which was not used for tr
 ## 1.
 
 Fitting neural network to learn the trigonometric sine function
-```{r,echo = FALSE}
+```{r,echo = FALSE,warning=FALSE}
 library(neuralnet)
 
 set.seed(1234567890)
@@ -293,6 +293,7 @@ plot(nn)
 plot(tr, cex=2)
 points(te, col = "blue", cex=1)
 points(te[,1],predict(nn,te), col="red", cex=1)
+legend(8,-0.5,legend = c("train","test","predict"),pch = 1,col = c("black","blue","red"))
 ```
 From the above graph we can see that prediction from the neural network on testdata is pretty good with a low mean square error of `r mse`
 
@@ -306,6 +307,7 @@ newdata <- data.frame(Var, Sin=sin(Var))
 new_predict = predict(nn,newdata)
 plot(newdata,col="red", ylim=c(-5,5))
 points(newdata$Var,new_predict,col="blue")
+legend(16,-3,legend = c("Dataset","Predict"),pch = 1,col = c("red","blue"))
 
 ```
 Prediction goes wrong after for the values which are not in training range this is because neural networks are not extrapolation methods.
@@ -328,6 +330,7 @@ plot(nn)
 ```{r, echo = FALSE}
 plot(newdata[,2],newdata[,1],col="red",xlab = "Sin",ylab = "Var")
 points(newdata[,2],predict(nn,newdata), col="blue", cex=1,xlab = "Sin", ylab = "Var")
+legend(-1,2,legend = c("Dataset","Predict"),pch = 1,col = c("red","blue"))
 ```
 
 Sin of a variables oscillates from -1 to 1, from the graph we can see that multiple values of variables give out same output when applied with sine function, this makes it harder for neural network to predict the independent variable from the response of sine function. As result we dont get a good prediction here.
