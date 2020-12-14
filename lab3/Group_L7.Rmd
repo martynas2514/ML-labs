@@ -185,7 +185,7 @@ ggplot(aes(x = time, y = value, color = variable), data = dat) +
 
 # 2. SUPPORT VECTOR MACHINES
 
-```{r, echo=FALSE, warning=FALSE}
+```{r, echo=FALSE, warning=FALSE, message=FALSE, error=FALSE}
 # Lab 3 block 1 of 732A99/TDDE01 Machine Learning
 # Author: jose.m.pena@liu.se
 # Made for teaching purposes
