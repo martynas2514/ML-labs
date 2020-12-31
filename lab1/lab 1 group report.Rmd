@@ -184,11 +184,11 @@ for (k in 1:30){
   
   # Calculation of Accuracies
   
-  fit_train <- fitted(KKNN_model_train)
+  fit_train <- KKNN_model_train$fitted.values
   CM_train <- table(dfTraining$target, fit_train)
   KKNN_misclassification_training[k] <- 1 - (sum(diag(CM_train)))/sum(CM_train)
   
-  fit_valid <- fitted(KKNN_model_valid)
+  fit_valid <- KKNN_model_valid$fitted.values
   CM_valid <- table(dfValidation$target, fit_valid)
   KKNN_misclassification_validation[k] <- 1 -(sum(diag(CM_valid)))/sum(CM_valid)
 
