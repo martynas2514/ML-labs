@@ -88,7 +88,7 @@ This will be our Confusion Matrix.
 kknn_model <- kknn(dfTraining[["target"]] ~ ., dfTraining, dfTest, k = 30, 
                    kernel = "rectangular")
 
-fit <- fitted(kknn_model)
+fit <- kknn_model$fitted.values
 CM_test <- table(dfTest$target, fit)
 CM_test
 accuracy_test <- (sum(diag(CM_test)))/sum(CM_test)
@@ -101,7 +101,7 @@ First we obtain the Confusion Matrix.
 ```{r }
 kknn_model <- kknn(dfTraining[["target"]] ~ ., dfTraining, dfTraining,
                    k = 30, kernel = "rectangular")
-fit <- fitted(kknn_model)
+fit <- kknn_model$fitted.values
 CM_train <- table(dfTraining$target, fit)
 CM_train
 accuracy_train <- (sum(diag(CM_train)))/sum(CM_train)
