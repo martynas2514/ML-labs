@@ -583,8 +583,8 @@ plot(model_lasso, xvar = "lambda", label = T)
 To choose lambda that has only 3 features , we can perform cross validation and check for lambda values which has only 3 variables. 
 
 ```{r,echo=FALSE}
-model=cv.glmnet(as.matrix(covariates),
-response, alpha=1,family="gaussian")
+model=cv.glmnet(as.matrix(covariates), response, alpha=1,family="gaussian")
+
 model_lasso_3 = glmnet(as.matrix(covariates), response, alpha = 1, family = "gaussian", lambda = model$lambda[which(model$nzero == 3)])
 plot(model_lasso_3, xvar = "lambda", label = T)
 cat("Lambda values that give 3 variables are :",model$lambda[which(model$nzero == 3)])
@@ -596,10 +596,12 @@ Dependence of degrees of freedom on panalty factor
 
 ```{r, echo=FALSE}
 df = function(lambda){
-ld = lambda * diag(ncol(covariates))
-H = covariates %*% solve(t(covariates) %*% covariates + ld) %*% t(covariates)
-DOF = sum(diag(H))
-return(DOF)
+  
+  ld = lambda * diag(ncol(covariates))
+  H = covariates %*% solve(t(covariates) %*% covariates + ld) %*% t(covariates)
+  DOF = sum(diag(H))
+  
+  return(DOF)
 }
 lambda_values = model_lasso$lambda
 degrees_of_freedom = c()
@@ -634,9 +636,9 @@ cat("Optimal lambda is :",best_lambda)
 ```
 Relationship between log(lambda) and MSE:
 As the lambda increases, the value of log(lambda) also increases, and we can see from the plot above that the MSE also increases with increasing lambda.
-Best lambda is given as zero for the above model , this makes sense as we can see from cvm(mean cross-validated error) vrs lambda plot , the error is minimum when lambda is zero.
+Best lambda is given as zero for the above model , this makes sense as we can see from cvm(mean cross-validated error) vs lambda plot , the error is minimum when lambda is zero.
 
-Fitting the model for 0 and log_lambda = -2 for comparision.
+Fitting the model for 0 and log_lambda = -2 for comparison.
 
 ```{r}
 m = cv.glmnet(as.matrix(covariates), response, alpha=1,family="gaussian",lambda=c(best_lambda,0.1353353))
