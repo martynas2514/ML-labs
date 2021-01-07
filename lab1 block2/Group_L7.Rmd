@@ -338,27 +338,30 @@ genenames <- colnames(train[ ,-ncol(train)])
 x <- t(train[ ,-ncol(train)])
 y=train[[ncol(train)]]
 mydata=list(x=x,y=as.factor(y),geneid=as.character(1:nrow(x)), genenames=genenames)
+set.seed(12345)
 model=pamr.train(mydata)
 cvmodel=pamr.cv(model,mydata)
-minError <- which.min(cvmodel$error)
+#pamr.plotcv(cvmodel) check this because 2 values can have same missclassification rate
+minError <- which(cvmodel$error == min(cvmodel$error))
+set.seed(12345)
 bestTh <- cvmodel$threshold[minError]
 
 ```
 
 
 ```{r , echo=FALSE}
-pamr.plotcen(model, mydata, threshold = bestTh)
+pamr.plotcen(model, mydata, threshold = bestTh[2])
 ```
 
 
 
 
 ```{r , echo=FALSE, results = FALSE}
-numberOfGenes <- model$nonzero[minError]
-listOfGenes  <- pamr.listgenes(model, mydata, bestTh)
+numberOfGenes <- model$nonzero[minError[2]]
+listOfGenes  <- pamr.listgenes(model, mydata, bestTh[2])
 bestGenes <- mydata$genenames[as.vector(as.numeric(listOfGenes[1:2,1]))]
 ```
-Centroid plot shows distance from gene mean value to global mean value. Positive or negative shows if mean is greater or smaller than the global mean.  No, it can't happen that all values for some gene in centroid plot are positive, because distance is calculated to the mean of all values of the gene . Number of genes selected when threshold = `r bestTh` : `r numberOfGenes`.
+Centroid plot shows distance from gene mean value to global mean value. Positive or negative shows if mean is greater or smaller than the global mean.  No, it can't happen that all values for some gene in centroid plot are positive, because distance is calculated to the mean of all values of the gene . Number of genes selected when threshold = `r bestTh[2]` : `r numberOfGenes`.
 
 
 ## 2. 
@@ -369,6 +372,7 @@ Centroid plot shows distance from gene mean value to global mean value. Positive
  
  
 ```{r , echo=FALSE, echo=FALSE, results = FALSE, message=FALSE, warning=FALSE}
+bestTh <- bestTh[2]
 rownames(test)=1:nrow(test)
 genenames <- colnames(test[ ,-ncol(test)])
 x <- t(test[ ,-ncol(test)])
@@ -391,7 +395,7 @@ library(glmnet)
 x <- as.matrix(train[ ,-ncol(train)])
 cv.elastic <- cv.glmnet(x, train$CellType, alpha = 0.5, family = "multinomial")
 
-res1 <- predict(cv.elastic, newx = as.matrix(test[ ,-ncol(test)]), s = cv.elastic$lambda.min, type = "class")
+res1 <- predict(cv.elastic, newx = as.matrix(test[ ,-ncol(test)]), s = "lambda.min", type = "class")
 ```
 
 ```{r , echo=FALSE}
@@ -414,7 +418,7 @@ Table bellow shows test error rate and number of features used.
 ```{r , echo=FALSE}
 
 results <- matrix(c(signif(sum(testdata$y != predictions)/length(predictions),digits = 2), numberOfGenes), nrow = 1)
-results <- rbind(results,c(signif(sum(testdata$y != res1)/length(res1),digits = 2), cv.elastic$nzero[which(cv.elastic$glmnet.fit$lambda == cv.elastic$lambda.min)]))
+results <- rbind(results,c(signif(sum(testdata$y != res1)/length(res1),digits = 2), cv.elastic$nzero[which(cv.elastic$lambda == cv.elastic$lambda.min)]))
 results <- rbind(results, c(signif(sum(testdata$y != res2)/length(res2),digits = 2), nrow(mydata$x)))
 row.names(results) <- c("NSC", "EN", "SVM")
 colnames(results) <- c("Test error rate", "N. features")
