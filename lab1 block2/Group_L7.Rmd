@@ -184,7 +184,8 @@ After this statement, executions of our implementation will be shown for K=2,3,4
 
 
 ```{r, echo=FALSE, out.width="50%"}
-whole_process <- function(K){set.seed(1234567890)
+whole_process <- function(K){
+  set.seed(1234567890)
 
   
   max_it <- 100 # max number of EM iterations
@@ -252,7 +253,10 @@ whole_process <- function(K){set.seed(1234567890)
       }
     }
     
-    llik[it] <- sum(rowSums((z_loglike_part1+ln_pi)*z))
+    llik_aux <- sum(log(rowSums(divisorz_2*divisorz_1)))
+    
+    #llik[it] <- sum(rowSums((z_loglike_part1+ln_pi)*z))
+    llik[it] <- llik_aux
     
     #cat("iteration: ", it, "log likelihood: ", llik[it], "\n")
     flush.console() 
@@ -412,10 +416,15 @@ res2 <- predict(svp, as.matrix(test[ ,-ncol(test)]))
 
 Table bellow shows test error rate and number of features used.
 ```{r , echo=FALSE}
-
+# features for centroid
 results <- matrix(c(signif(sum(testdata$y != predictions)/length(predictions),digits = 2), numberOfGenes), nrow = 1)
+
+# features for elastic
 results <- rbind(results,c(signif(sum(testdata$y != res1)/length(res1),digits = 2), cv.elastic$nzero[which(cv.elastic$glmnet.fit$lambda == cv.elastic$lambda.min)]))
+
+# features for svm
 results <- rbind(results, c(signif(sum(testdata$y != res2)/length(res2),digits = 2), nrow(mydata$x)))
+
 row.names(results) <- c("NSC", "EN", "SVM")
 colnames(results) <- c("Test error rate", "N. features")
 knitr::kable(results)
