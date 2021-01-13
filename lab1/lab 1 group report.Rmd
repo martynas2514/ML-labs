@@ -629,7 +629,6 @@ To find optimal lambda, we use cross validation.
 
 ```{r,echo=FALSE}
 model_l=cv.glmnet(as.matrix(covariates), response, alpha=1,family="gaussian",lambda=seq(0,1,0.001))
-best_lambda = model_l$lambda.1se
 plot(model_l)
 plot(model_l$lambda,model_l$cvm,xlab="lambda",ylab="Mean CV error")
 cat("Optimal lambda is :",best_lambda)
