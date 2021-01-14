@@ -307,25 +307,25 @@ $\hat y \sim N(w_0 +w^tX, \sigma^2)$ where $w \sim N(0, \frac{\sigma^2}{\lambda}
 * $\lambda$ - regularization penalty
 * $\sigma$ - standard deviation
 
-<!-- Bayes' theorem: -->
+Bayes' theorem:
 
-<!-- $$ p(w|d)\propto(D|w)p(w)$$ -->
-<!-- Probability of y: -->
+$$ p(w|d)\propto(D|w)p(w)$$
+Probability of y:
 
-<!-- $$ p(y| X, w,\sigma) = N(w_0 +w^tX_i, \sigma^2) $$ -->
+$$ p(y| X, w,\sigma) = N(w_0 +w^tX_i, \sigma^2) $$
 
-<!-- Prior probability: -->
+Prior probability:
 
-<!-- $$ p(w) \sim N(0, \frac{\sigma^2}{\lambda}) = \frac 1 {\sqrt{2 \pi \frac {\sigma^2 }{\lambda}} } e^ - { \frac {(w)^2}{2 \frac {\sigma^2}{\lambda}}} $$ -->
-<!-- Likelihood: -->
+$$ p(w) \sim N(0, \frac{\sigma^2}{\lambda}) = \frac 1 {\sqrt{2 \pi \frac {\sigma^2 }{\lambda}} } e^ - { \frac {(w)^2}{2 \frac {\sigma^2}{\lambda}}} $$
+Likelihood:
 
-<!-- $$ p(D|w) = \prod^n_{i = 1} N(w_0 +w^tX_i, \sigma^2) $$ -->
+$$ p(D|w) = \prod^n_{i = 1} N(w_0 +w^tX_i, \sigma^2) $$
 
-<!-- $$ p(D|w) = \prod^n_{i = 1} \frac 1 {\sqrt{2 \pi \sigma^2} } e^ - { \frac {(y - X_iw)^2}{2 \sigma^2}} = \frac 1 {(\sqrt{2 \pi \sigma^2})^n } e^ - \sum^n_{i = 1} \frac{(y_i - w^TX_i)^2} {2\sigma^2} $$ -->
+$$ p(D|w) = \prod^n_{i = 1} \frac 1 {\sqrt{2 \pi \sigma^2} } e^ - { \frac {(y - X_iw)^2}{2 \sigma^2}} = \frac 1 {(\sqrt{2 \pi \sigma^2})^n } e^ - \sum^n_{i = 1} \frac{(y_i - w^TX_i)^2} {2\sigma^2} $$
 
-<!-- Model: -->
+Model:
 
-<!-- $$ p(w|D) \propto \frac 1 {(\sqrt{2 \pi \sigma^2})^n } e^ - \sum^n_{i = 1} \frac{(y_i - w^TX_i)^2} {2\sigma^2}  * \frac 1 {\sqrt{2 \pi \frac {\sigma^2 }{\lambda}} } e^ - { \frac {(w)^2}{2 \frac {\sigma^2}{\lambda}}} = \frac{\sqrt \lambda}{(\sqrt{2 \pi \sigma^2})^{n+1}} e^{- \frac{\sum^n_{i=1} (y_i - w^TX_i)^2 + w^2\lambda}{2\sigma^2}} $$ -->
+$$ p(w|D) \propto \frac 1 {(\sqrt{2 \pi \sigma^2})^n } e^ - \sum^n_{i = 1} \frac{(y_i - w^TX_i)^2} {2\sigma^2}  * \frac 1 {{(\sqrt{2 \pi \frac {\sigma^2 }{\lambda}})}^j } e^ - { \frac {\sum^j(w)^2}{2 \frac {\sigma^2}{\lambda}}} = \frac{\sqrt \lambda}{(\sqrt{2 \pi \sigma^2})^{n+1}} e^{- \frac{\sum^n_{i=1} (y_i - w^TX_i)^2 + \lambda\sum^jw^2}{2\sigma^2}} $$
 
 ## 2.
 
@@ -631,7 +631,7 @@ To find optimal lambda, we use cross validation.
 model_l=cv.glmnet(as.matrix(covariates), response, alpha=1,family="gaussian",lambda=seq(0,1,0.001))
 plot(model_l)
 plot(model_l$lambda,model_l$cvm,xlab="lambda",ylab="Mean CV error")
-cat("Optimal lambda is :",best_lambda)
+cat("Optimal lambda is :",model_l$lambda.min)
 ```
 Relationship between log(lambda) and MSE:
 As the lambda increases, the value of log(lambda) also increases, and we can see from the plot above that the MSE also increases with increasing lambda.
@@ -640,7 +640,7 @@ Best lambda is given as zero for the above model , this makes sense as we can se
 Fitting the model for 0 and log_lambda = -2 for comparison.
 
 ```{r}
-m = cv.glmnet(as.matrix(covariates), response, alpha=1,family="gaussian",lambda=c(best_lambda,0.1353353))
+m = cv.glmnet(as.matrix(covariates), response, alpha=1,family="gaussian",lambda=c(model_l$lambda.min,0.1353353))
 ```
 ```{r,echo = FALSE}
 cat("CV Error when lambda is ",m$lambda[1] ," =",m$cvm[1])
@@ -652,7 +652,7 @@ Also in lambda vrs Mean Cv error plot , we can see that for lambda = 0.1353353 (
 Plot for Y vrs predicted Y for test data using optimal lambda
 
 ```{r,echo = FALSE}
-model_optimallasso =  glmnet(as.matrix(covariates), response, alpha = 1, family = "gaussian", lambda = best_lambda)
+model_optimallasso =  glmnet(as.matrix(covariates), response, alpha = 1, family = "gaussian", lambda = model_l$lambda.min)
 y = as.matrix(scale(test[,102]))
 ypred=predict(model_optimallasso, newx=as.matrix(scale(test[, 2:101])), type="response")
 scatter.smooth(y,ypred)
