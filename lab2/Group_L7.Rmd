@@ -136,7 +136,7 @@ discrim <- function(x,a){
 ### e)
  
  
- $$(w_i - w_k)x + (w_{0k} - w_{0i}) = 0$$
+ $$(w_k - w_i)x + (w_{0k} - w_{0i}) = 0$$
 ```{r, echo=FALSE, message=FALSE}
 w0 <- function(a){
   constant <- (-1/2) * t(a$mean) %*% solve(pcov) %*% a$mean + log(a$prior)
