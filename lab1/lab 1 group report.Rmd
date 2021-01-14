@@ -325,7 +325,7 @@ $$ p(D|w) = \prod^n_{i = 1} \frac 1 {\sqrt{2 \pi \sigma^2} } e^ - { \frac {(y - 
 
 Model:
 
-$$ p(w|D) \propto \frac 1 {(\sqrt{2 \pi \sigma^2})^n } e^ - \sum^n_{i = 1} \frac{(y_i - w^TX_i)^2} {2\sigma^2}  * \frac 1 {{(\sqrt{2 \pi \frac {\sigma^2 }{\lambda}})}^j } e^ - { \frac {\sum^j(w)^2}{2 \frac {\sigma^2}{\lambda}}} = \frac{\sqrt \lambda}{(\sqrt{2 \pi \sigma^2})^{n+1}} e^{- \frac{\sum^n_{i=1} (y_i - w^TX_i)^2 + \lambda\sum^jw^2}{2\sigma^2}} $$
+$$ p(w|D) \propto \frac 1 {(\sqrt{2 \pi \sigma^2})^n } e^ - \sum^n_{i = 1} \frac{(y_i - w^TX_i)^2} {2\sigma^2}  * \frac 1 {{(\sqrt{2 \pi \frac {\sigma^2 }{\lambda}})}^j } e^ - { \frac {\sum^j(w)^2}{2 \frac {\sigma^2}{\lambda}}} = \frac{\sqrt \lambda}{(\sqrt{2 \pi \sigma^2})^{n+j}} e^{- \frac{\sum^n_{i=1} (y_i - w^TX_i)^2 + \lambda\sum^jw^2}{2\sigma^2}} $$
 
 ## 2.
 
